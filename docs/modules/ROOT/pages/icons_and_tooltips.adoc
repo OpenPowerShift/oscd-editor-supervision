@@ -35,6 +35,10 @@ Refer to xref:allowing_supervision_modifications.adoc[].
 |Search (`search`)
 |The search field.
 
+|Sort (`sort`)
+|The sort dialog.
+The icon is in the primary colour when the order is not the document order.
+
 |Heart with plus (`heart_plus`)
 |The New supervision entry.
 |===

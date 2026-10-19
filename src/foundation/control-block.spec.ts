@@ -118,6 +118,16 @@ describe('control-block', () => {
     );
   });
 
+  it('lists the control blocks in ascending IED and control block order', () => {
+    const blocks = controlBlocksOfOtherIeds(
+      doc,
+      ied(doc, 'GOOSE_Subscriber1'),
+      'GOOSE'
+    );
+    const names = blocks.map(block => controlBlockName(block));
+    expect(names).to.deep.equal([...names].sort((a, b) => a.localeCompare(b)));
+  });
+
   it('lists the sampled value control blocks for sampled values', () => {
     const blocks = controlBlocksOfOtherIeds(
       doc,

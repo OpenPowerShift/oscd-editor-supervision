@@ -146,6 +146,16 @@ describe('actions', () => {
     expect(supervisionLns(subscriber, 'GOOSE').length).to.equal(2);
   });
 
+  it('deletes a supervision whose source reference is not editable', () => {
+    const subscriber = ied(doc, 'GOOSE_Subscriber3');
+    const nodes = supervisionLns(subscriber, 'GOOSE');
+    expect(deleteSupervisionEdit(subscriber, 'GOOSE', nodes[0])).to.equal(null);
+    const edit = deleteSupervisionEdit(subscriber, 'GOOSE', nodes[1]);
+    expect(edit === null).to.equal(false);
+    applyEdit(edit!);
+    expect(supervisionLns(subscriber, 'GOOSE').length).to.equal(2);
+  });
+
   it('creates an empty supervision next to the existing ones', () => {
     const subscriber = ied(doc, 'GOOSE_Subscriber1');
     const edit = createSupervisionLnEdit(subscriber, 'GOOSE')!;

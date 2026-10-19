@@ -59,6 +59,21 @@ describe('oscd-editor-supervision screenshots', () => {
     await shot('with the IED dialog open');
   });
 
+  it('with the sort dialog open', async () => {
+    await mount();
+    await driver.selectIed('GOOSE_Subscriber1');
+    await driver.openSort();
+    await shot('with the sort dialog open');
+  });
+
+  it('with a non-default sort order', async () => {
+    await mount();
+    await driver.selectIed('GOOSE_Subscriber4');
+    await driver.openSort();
+    await driver.chooseSort('Supervision description');
+    await shot('with a non-default sort order');
+  });
+
   it('with a supervision selected', async () => {
     await mount();
     await driver.selectIed('GOOSE_Subscriber4');

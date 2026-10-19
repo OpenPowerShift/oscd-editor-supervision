@@ -55,6 +55,80 @@ export class PluginDriver {
       .map(element => this.headline(element));
   }
 
+  /** The supervision path of each used row, in order. */
+  supervisionNames(list: ListName): string[] {
+    return this.items(list)
+      .filter(element => element.classList.contains('row'))
+      .map(element =>
+        normalize(
+          element.querySelector<HTMLElement>('.supervision-name')?.textContent
+        )
+      );
+  }
+
+  /** The control block name of each used row, in order. */
+  controlNames(list: ListName): string[] {
+    return this.items(list)
+      .filter(element => element.classList.contains('row'))
+      .map(element =>
+        normalize(
+          element.querySelector<HTMLElement>('.control-name')?.textContent
+        )
+      );
+  }
+
+  /** Opens the sort dialog. */
+  async openSort(): Promise<void> {
+    const sortButton = this.root.querySelector('sort-button')!;
+    const dialog = sortButton.shadowRoot!.querySelector('oscd-dialog')!;
+    const opened = new Promise<void>((resolve) => {
+      dialog.addEventListener('opened', () => resolve(), { once: true });
+    });
+    (
+      sortButton.shadowRoot!.querySelector('#sortButton') as HTMLElement
+    ).click();
+    await opened;
+    const list = sortButton.shadowRoot!.querySelector(
+      'oscd-selection-list'
+    ) as HTMLElement & { updateComplete: Promise<unknown> };
+    await list.updateComplete;
+  }
+
+  /** Chooses a sort order in the open dialog and applies it. */
+  async chooseSort(label: string): Promise<void> {
+    const sortButton = this.root.querySelector('sort-button')!;
+    const dialog = sortButton.shadowRoot!.querySelector('oscd-dialog')!;
+    const list = sortButton.shadowRoot!.querySelector('oscd-selection-list')!;
+    await (list as HTMLElement & { updateComplete: Promise<unknown> })
+      .updateComplete;
+    const item = Array.from(
+      list.shadowRoot!.querySelectorAll<HTMLElement>('oscd-list-item')
+    ).find(element => normalize(element.textContent).includes(label));
+    if (!item) {
+      throw new Error(`No sort order "${label}" in the dialog`);
+    }
+    item.click();
+    await this.settle();
+    const closed = new Promise<void>((resolve) => {
+      dialog.addEventListener('closed', () => resolve(), { once: true });
+    });
+    (
+      sortButton.shadowRoot!.querySelector('oscd-filled-button') as HTMLElement
+    ).click();
+    await closed;
+    await this.settle();
+  }
+
+  /** Whether the sort button shows a non-default order. */
+  sortIsOffNominal(): boolean {
+    return (
+      this.root
+        .querySelector('sort-button')!
+        .shadowRoot!.querySelector('#sortButton')
+        ?.classList.contains('off-nominal') ?? false
+    );
+  }
+
   /** The supporting text of the rows of a list, in order. */
   subheadings(list: ListName): string[] {
     return this.items(list)
@@ -76,18 +150,14 @@ export class PluginDriver {
     const filter = this.child('ied-selector').shadowRoot!.querySelector(
       'oscd-filter-button'
     )!;
+    const dialog = filter.shadowRoot!.querySelector('oscd-dialog')!;
+    const opened = new Promise<void>((resolve) => {
+      dialog.addEventListener('opened', () => resolve(), { once: true });
+    });
     (
       filter.shadowRoot!.querySelector('oscd-icon-button') as HTMLElement
     ).click();
-    await waitFor(
-      () =>
-        (
-          filter.shadowRoot!.querySelector('oscd-dialog') as HTMLElement & {
-            open: boolean;
-          }
-        ).open === true,
-      'the IED dialog did not open'
-    );
+    await opened;
   }
 
   /** Selects an IED in the open dialog and applies it. */

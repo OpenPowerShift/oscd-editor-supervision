@@ -11,6 +11,25 @@ if (customElements.get(tagName) === undefined) {
 }
 
 describe('ied-selector', () => {
+  it('lists the IEDs in ascending name order', async () => {
+    const doc = await loadFixture('supervisions.scd');
+    const ieds = Array.from(doc.querySelectorAll(':root > IED')).reverse();
+    const element = await fixture<IedSelector>(html`
+      <ied-selector-spec .ieds=${ieds} .selected=${ieds[0]}></ied-selector-spec>
+    `);
+    const filter = element.shadowRoot!.querySelector('oscd-filter-button')!;
+    const dialog = filter.shadowRoot!.querySelector('oscd-dialog')!;
+    const opened = new Promise<void>((resolve) => {
+      dialog.addEventListener('opened', () => resolve(), { once: true });
+    });
+    (filter.shadowRoot!.querySelector('oscd-icon-button') as HTMLElement).click();
+    await opened;
+    const names = Array.from(
+      filter.shadowRoot!.querySelectorAll<HTMLElement>('oscd-list-item')
+    ).map(item => normalize(item.textContent).split(' ')[0]);
+    expect(names).to.deep.equal([...names].sort((a, b) => a.localeCompare(b)));
+  });
+
   it('lists the IEDs, marks the current one and emits the chosen one', async () => {
     const doc = await loadFixture('supervisions.scd');
     const ieds = Array.from(doc.querySelectorAll(':root > IED'));
@@ -23,14 +42,12 @@ describe('ied-selector', () => {
     });
 
     const filter = element.shadowRoot!.querySelector('oscd-filter-button')!;
+    const dialog = filter.shadowRoot!.querySelector('oscd-dialog')!;
+    const opened = new Promise<void>((resolve) => {
+      dialog.addEventListener('opened', () => resolve(), { once: true });
+    });
     (filter.shadowRoot!.querySelector('oscd-icon-button') as HTMLElement).click();
-    await waitUntil(
-      () =>
-        (filter.shadowRoot!.querySelector('oscd-dialog') as HTMLElement & {
-          open: boolean;
-        }).open,
-      'the dialog did not open'
-    );
+    await opened;
 
     const items = Array.from(
       filter.shadowRoot!.querySelectorAll<HTMLElement>('oscd-list-item')

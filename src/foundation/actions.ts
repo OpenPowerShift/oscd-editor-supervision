@@ -117,6 +117,10 @@ export function disconnectSupervisionEdit(
 /**
  * Delete a supervision logical node. The first one of its kind in the IED
  * cannot be deleted: scl-lib uses it as the template for new ones.
+ *
+ * Deleting the node does not change its reference, so it does not need an
+ * editable `setSrcRef`. The node is removed even when the IED does not allow
+ * supervision changes, as long as it is not the first one.
  * @param ied - the IED that holds the supervision.
  * @param controlType - GOOSE or sampled values.
  * @param supervisionLn - the `LGOS` or `LSVS` to delete.
@@ -130,10 +134,7 @@ export function deleteSupervisionEdit(
   if (!canDeleteSupervision(supervisionLn, ied, controlType)) {
     return null;
   }
-  return removeSupervision(supervisionLn, {
-    removeSupervisionLn: true,
-    checkSubscription: false
-  });
+  return { node: supervisionLn };
 }
 
 /**

@@ -35,9 +35,12 @@ describe('supervision-table', () => {
     const element = await fixture<SupervisionTable>(
       html`<supervision-table-spec .rows=${model.used}></supervision-table-spec>`
     );
-    expect(element.shadowRoot!.textContent).to.contain(
-      'GOOSE_Publisher > GOOSE2 - Trip'
-    );
+    expect(
+      element.shadowRoot!.querySelector('.control-name')!.textContent
+    ).to.contain('GOOSE_Publisher > GOOSE2');
+    expect(
+      element.shadowRoot!.querySelector('.control-description')!.textContent
+    ).to.contain('Trip');
   });
 
   it('emits the supervision of the chosen action', async () => {
@@ -89,8 +92,7 @@ describe('supervision-table', () => {
       ) as HTMLButtonElement;
 
     expect(
-      (rows[0].querySelector('[slot="supporting-text"]') as HTMLElement)
-        .textContent
+      (rows[0].querySelector('.supervision-name') as HTMLElement).textContent
     ).to.contain('LGOS1');
     expect(deleteButton(rows[0]).disabled).to.equal(true);
     expect(deleteButton(rows[1]).disabled).to.equal(false);

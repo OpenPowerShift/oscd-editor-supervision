@@ -47,20 +47,36 @@ export class SupervisionTable extends ScopedElementsMixin(LitElement) {
 
   private renderRow(row: SupervisionInfo): TemplateResult {
     const controlName = row.controlBlock
-      ? `${row.controlBlock.name}${
-        row.controlBlock.ownDescription
-          ? ` - ${row.controlBlock.ownDescription}`
-          : ''
-      }`
+      ? row.controlBlock.name
       : msg('No control block in this file');
+    const controlDescription = row.controlBlock?.description;
+    const hasDescription = !!row.description || !!controlDescription;
     return html`<oscd-list-item class="row">
       <oscd-icon slot="start">monitor_heart</oscd-icon>
-      <div slot="headline">${controlName}</div>
-      <div slot="supporting-text">
-        <span class="supervision">${row.path}</span>${row.description
-          ? html` - ${row.description}`
-          : nothing}
+      <div slot="headline">
+        <span class="supervision-name">${row.path}</span>
+        <span class="source ${row.controlBlock ? '' : 'missing'}">
+          <oscd-icon class="arrow">arrow_forward</oscd-icon>
+          <span class="control-name">${controlName}</span>
+        </span>
       </div>
+      ${hasDescription
+        ? html`<div slot="supporting-text">
+            ${row.description
+              ? html`<span class="supervision-description"
+                  >${row.description}</span
+                >`
+              : nothing}
+            ${controlDescription
+              ? html`<span class="source">
+                  <oscd-icon class="arrow">arrow_forward</oscd-icon>
+                  <span class="control-description"
+                    >${controlDescription}</span
+                  >
+                </span>`
+              : nothing}
+          </div>`
+        : nothing}
       <div slot="end" class="actions">
         <oscd-icon-button
           data-action="disconnect"
@@ -75,7 +91,7 @@ export class SupervisionTable extends ScopedElementsMixin(LitElement) {
           data-action="delete"
           title=${msg('Delete this supervision')}
           .ariaLabel=${msg('Delete this supervision')}
-          .disabled=${!row.deletable || !row.editable}
+          .disabled=${!row.deletable}
           @click=${() => this.handleDelete(row.element)}
         >
           <oscd-icon>delete</oscd-icon>
@@ -101,13 +117,47 @@ export class SupervisionTable extends ScopedElementsMixin(LitElement) {
     }
 
     [slot='headline'] {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
       font-weight: 500;
     }
 
-    /* The supervision is the container; the control block is the message it
-       watches. This keeps the supervision readable on the second line. */
-    .supervision {
-      font-weight: 500;
+    /*
+     * The control block, and its description, are tinted from the text colour
+     * so that they read as a separate thing from the supervision, in any row
+     * state. They move to the next line whole when they do not fit.
+     */
+    .source {
+      display: inline-flex;
+      flex: 0 1 auto;
+      flex-wrap: wrap;
+      align-items: center;
+      min-inline-size: 0;
+      max-inline-size: 100%;
+      box-sizing: border-box;
+      padding: 0 6px 0 2px;
+      border-radius: 4px;
+      background-color: color-mix(in srgb, currentColor 8%, transparent);
+      overflow-wrap: anywhere;
+      white-space: normal;
+    }
+
+    .source.missing {
+      font-style: italic;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .arrow {
+      --md-icon-size: 18px;
+    }
+
+    [slot='supporting-text'] {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
     }
 
     .actions {

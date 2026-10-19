@@ -99,7 +99,7 @@ export class AvailableSupervisions extends ScopedElementsMixin(LitElement) {
         data-action="delete"
         title=${msg('Delete this supervision')}
         .ariaLabel=${msg('Delete this supervision')}
-        .disabled=${!row.deletable || !row.editable}
+        .disabled=${!row.deletable}
         @click=${(event: Event) => {
           event.stopPropagation();
           this.dispatchEvent(

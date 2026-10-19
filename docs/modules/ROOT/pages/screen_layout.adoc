@@ -22,6 +22,9 @@ Control type:: The switch selects GOOSE or sampled values.
 * *Sampled values* shows the `LSVS` supervisions and the sampled value control
   blocks.
 
+Sort:: The button opens the sort dialog.
+Refer to xref:sorting.adoc[].
+
 Usage:: The text at the right shows how many supervisions are used, for example
 `2 of 3 supervisions used`.
 
@@ -47,8 +50,9 @@ one below the other.
 
 == The plugin keeps nothing
 
-The plugin does not keep the selection, the control type or the search text.
-The next session starts with the first IED and GOOSE.
+The plugin does not keep the selection, the control type, the sort order or the
+search text.
+The next session starts with the first IED of the selector and GOOSE.
 
 == Empty states
 

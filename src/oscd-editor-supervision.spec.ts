@@ -26,16 +26,32 @@ describe('oscd-editor-supervision', () => {
     expect(mounted.host.scrollHeight).to.equal(mounted.host.clientHeight);
   });
 
+  it('selects the first IED of the selector by default', async () => {
+    await mount();
+    expect(driver.emptyHeading()).to.equal('GOOSE_Publisher');
+    await driver.openIedDialog();
+    const filter = mounted.plugin
+      .shadowRoot!.querySelector('ied-selector')!
+      .shadowRoot!.querySelector('oscd-filter-button')!;
+    const items = Array.from(
+      filter.shadowRoot!.querySelectorAll<HTMLElement>('oscd-list-item')
+    );
+    const checked = items.find(item =>
+      item.querySelector('oscd-radio')?.hasAttribute('checked')
+    );
+    expect(checked).to.equal(items[0]);
+  });
+
   it('renders the supervisions of the chosen IED', async () => {
     await mount();
     await driver.selectIed('GOOSE_Subscriber1');
-    expect(driver.headlines('used')).to.deep.equal([
-      'GOOSE_Publisher > GOOSE2',
-      'GOOSE_Publisher2 > GOOSE2'
-    ]);
-    expect(driver.subheadings('used')).to.deep.equal([
+    expect(driver.supervisionNames('used')).to.deep.equal([
       'GOOSE_Supervision/LGOS1',
       'GOOSE_Supervision/LGOS2'
+    ]);
+    expect(driver.controlNames('used')).to.deep.equal([
+      'GOOSE_Publisher > GOOSE2',
+      'GOOSE_Publisher2 > GOOSE2'
     ]);
     expect(driver.headlines('available')).to.deep.equal([
       'GOOSE_Supervision/LGOS3'
@@ -64,11 +80,11 @@ describe('oscd-editor-supervision', () => {
         )[0]
       )
     ).to.equal('GOOSE_PublisherQB2_Disconnector/LLN0.GOOSE2');
-    expect(driver.headlines('used')).to.deep.equal([
-      'GOOSE_Publisher > GOOSE2'
-    ]);
-    expect(driver.subheadings('used')).to.deep.equal([
+    expect(driver.supervisionNames('used')).to.deep.equal([
       'GOOSE_Supervision/LGOS1'
+    ]);
+    expect(driver.controlNames('used')).to.deep.equal([
+      'GOOSE_Publisher > GOOSE2'
     ]);
   });
 
@@ -83,10 +99,7 @@ describe('oscd-editor-supervision', () => {
       'IED[name="GOOSE_Subscriber4"]'
     )!;
     expect(supervisionLns(subscriber, 'GOOSE').length).to.equal(5);
-    expect(driver.headlines('used')).to.deep.equal([
-      'GOOSE_Publisher > GOOSE2'
-    ]);
-    expect(driver.subheadings('used')).to.deep.equal([
+    expect(driver.supervisionNames('used')).to.deep.equal([
       'GOOSE_Supervision/LGOS4'
     ]);
   });
@@ -125,7 +138,7 @@ describe('oscd-editor-supervision', () => {
       item.querySelector(
         'oscd-icon-button[data-action="delete"]'
       ) as HTMLButtonElement;
-    expect(driver.subheadings('used')[0]).to.contain(
+    expect(driver.supervisionNames('used')[0]).to.equal(
       'GOOSE_Supervision/LGOS1'
     );
     expect(deleteButton(items[0]).disabled).to.equal(true);
@@ -149,6 +162,31 @@ describe('oscd-editor-supervision', () => {
       )
     ).to.equal(null);
     expect(driver.headlines('used').length).to.equal(0);
+  });
+
+  it('sorts the supervisions and marks a non-default order', async () => {
+    await mount();
+    await driver.selectIed('GOOSE_Subscriber4');
+    await driver.openSort();
+    await driver.chooseSort('Supervision description');
+
+    expect(driver.sortIsOffNominal()).to.equal(true);
+    expect(driver.headlines('available')).to.deep.equal([
+      'GOOSE_Supervision/LGOS2',
+      'GOOSE_Supervision/LGOS3',
+      'GOOSE_Supervision/LGOS1',
+      'GOOSE_Supervision/LGOS3'
+    ]);
+
+    await driver.openSort();
+    await driver.chooseSort('Document order');
+    expect(driver.sortIsOffNominal()).to.equal(false);
+    expect(driver.headlines('available')).to.deep.equal([
+      'GOOSE_Supervision/LGOS1',
+      'GOOSE_Supervision/LGOS2',
+      'GOOSE_Supervision/LGOS3',
+      'GOOSE_Supervision/LGOS3'
+    ]);
   });
 
   it('explains why it cannot change a supervision', async () => {

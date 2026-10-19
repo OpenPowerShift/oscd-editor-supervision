@@ -14,6 +14,7 @@ import { oscdPaletteMd3 } from './theme.js';
 import { AvailableSupervisions } from './components/available-supervisions.js';
 import { ControlBlockList } from './components/control-block-list.js';
 import { IedSelector } from './components/ied-selector.js';
+import { SortButton } from './components/sort-button.js';
 import { SupervisionTable } from './components/supervision-table.js';
 import {
   assignSupervisionEdit,
@@ -28,8 +29,14 @@ import {
 } from './foundation/control-type.js';
 import type { ControlType } from './foundation/control-type.js';
 import { getDescriptionAttribute, getNameAttribute } from './foundation/foundation.js';
+import { compareNames } from './foundation/sort.js';
 import { buildModel } from './foundation/model.js';
 import type { SupervisionModel } from './foundation/model.js';
+import {
+  sortControlBlocks,
+  sortSupervisions
+} from './foundation/sort.js';
+import type { SupervisionSortOrder } from './foundation/sort.js';
 
 const controlIconName = { GOOSE: 'gooseIcon', SMV: 'smvIcon' } as const;
 
@@ -49,6 +56,7 @@ export default class OscdEditorSupervision extends ScopedElementsMixin(
     'supervision-table': SupervisionTable,
     'available-supervisions': AvailableSupervisions,
     'control-block-list': ControlBlockList,
+    'sort-button': SortButton,
     'oscd-icon': OscdIcon,
     'oscd-outlined-segmented-button': OscdOutlinedSegmentedButton,
     'oscd-outlined-segmented-button-set': OscdOutlinedSegmentedButtonSet
@@ -74,11 +82,23 @@ export default class OscdEditorSupervision extends ScopedElementsMixin(
   private newSupervision = false;
 
   @state()
+  private sortOrder: SupervisionSortOrder = 'document';
+
+  @state()
   private model!: SupervisionModel;
 
+  /**
+   * The IEDs in the order the IED selector shows them: by name. The first one
+   * is the default, so the first row of the selector is the selected one.
+   */
   private get ieds(): Element[] {
     return this.doc
-      ? Array.from(this.doc.querySelectorAll(':root > IED'))
+      ? Array.from(this.doc.querySelectorAll(':root > IED')).sort((a, b) =>
+        compareNames(
+          getNameAttribute(a) ?? '',
+          getNameAttribute(b) ?? ''
+        )
+      )
       : [];
   }
 
@@ -234,6 +254,12 @@ export default class OscdEditorSupervision extends ScopedElementsMixin(
         </p>
       </div>
       ${this.renderSwitches()}
+      <sort-button
+        .order=${this.sortOrder}
+        @sort-change=${(event: CustomEvent<{ order: SupervisionSortOrder }>) => {
+          this.sortOrder = event.detail.order;
+        }}
+      ></sort-button>
       <span class="usage">
         ${used} ${msg('of')} ${total} ${msg('supervisions used')}
       </span>
@@ -268,6 +294,15 @@ export default class OscdEditorSupervision extends ScopedElementsMixin(
     }
     const lnClass = supervisionLnClass[this.controlType];
     const canCreate = this.model.canCreate;
+    const used = sortSupervisions(this.model.used, this.sortOrder);
+    const available = sortSupervisions(
+      this.model.available,
+      this.sortOrder
+    );
+    const assignable = sortControlBlocks(
+      this.model.assignable,
+      this.sortOrder
+    );
     return html`<div class="container">
       ${this.renderHeader(ied)} ${this.renderNotice()}
       <div class="content">
@@ -278,7 +313,7 @@ export default class OscdEditorSupervision extends ScopedElementsMixin(
               : msg('LSVS supervisions')}
           </h2>
           <supervision-table
-            .rows=${this.model.used}
+            .rows=${used}
             @supervision-disconnect=${(
               event: CustomEvent<{ element: Element }>
             ) => this.handleDisconnect(event)}
@@ -290,7 +325,7 @@ export default class OscdEditorSupervision extends ScopedElementsMixin(
           <section>
             <h2>${msg('Available supervisions')}</h2>
             <available-supervisions
-              .rows=${this.model.available}
+              .rows=${available}
               supervisionClass=${lnClass}
               ?canCreate=${canCreate}
               .available=${(this.model.max ?? 0) - this.model.instantiated}
@@ -312,7 +347,7 @@ export default class OscdEditorSupervision extends ScopedElementsMixin(
                 : msg('Sampled value control blocks')}
             </h2>
             <control-block-list
-              .rows=${this.model.assignable}
+              .rows=${assignable}
               iconName=${controlIconName[this.controlType]}
               ?assignable=${this.newSelection || this.selection !== undefined}
               @control-select=${(event: CustomEvent<{ element: Element }>) =>

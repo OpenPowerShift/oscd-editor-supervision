@@ -4,6 +4,7 @@
 * xref:supervisions.adoc[]
 * xref:assigning.adoc[]
 * xref:searching.adoc[]
+* xref:sorting.adoc[]
 * xref:icons_and_tooltips.adoc[]
 * xref:allowing_supervision_modifications.adoc[]
 * xref:support.adoc[]
