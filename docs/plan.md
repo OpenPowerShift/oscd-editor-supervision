@@ -411,8 +411,8 @@ name `oscd-editor-supervision`, title *Supervision*.
 | 4 | Demo: `oscd-shell`, `demo/plugins.js`, `demo/sample.scd`, open/save menu plugins | done |
 | 5 | Tests: driver and plugin helpers, component specs, screenshot tests, coverage thresholds | done |
 | 6 | CI and release: `test.yml`, `update-visual-baselines.yml`, `release.yml`, delete old workflows, YAML validation | done |
-| 7 | Docs: move to `docs/`, rewrite pages, symlinks, orchestrator playbook, Antora verification | in progress |
-| 8 | Final checks: lint, tsc, build, test, bundle, pack, legacy grep, empty-file check, demo in Playwright, report | pending |
+| 7 | Docs: move to `docs/`, rewrite pages, symlinks, orchestrator playbook, Antora verification | done |
+| 8 | Final checks: lint, tsc, build, test, bundle, pack, legacy grep, empty-file check, demo in Playwright, report | done |
 
 Every step: `npm run lint`, `npx tsc --noEmit`, `npm run build`, `npm test`; one
 Conventional Commit with only that step's files; update this table and the
@@ -762,9 +762,28 @@ The symlinks stay broken until the `update-visual-baselines` run commits the
 baselines. The `test.yml` documentation image check fails until then, by
 design.
 
-### Step 8
+### Step 8 — Final checks
 
-To be written when the final checks are complete.
+| Check | Result |
+|---|---|
+| `npm run lint` | pass |
+| `npx tsc --noEmit` | pass |
+| `npm run build` | pass |
+| `npm test` | 116 tests, pass, coverage thresholds met |
+| `npm run bundle` | pass; `dist/oscd-editor-supervision.js` (1.6 MB) and `dist/demo/` |
+| `npm pack --dry-run` | 22 files, no `*.spec.*`, `*.test.*`, `dist/testing` or `dist/demo`; `main` file present |
+| Legacy import search in `src/` | no match (`@openscd/open-scd`, `@material/`, `@openenergytools/`, `lit-translate`, `newActionEvent`) |
+| Empty tracked files | only the five intended `.gitkeep` files |
+| Git LFS | `git lfs ls-files` empty; `.gitattributes` marks `test/**/*.png binary` |
+| Demo in Playwright | shell and editor present, no console or page error, no page scroll |
+| Release-please files | present with `package-name: oscd-editor-supervision` |
+| Workflows | `test.yml`, `update-visual-baselines.yml`, `release.yml` all parse; no `deploy.yml` |
+
+**Left for the owner**
+
+* Pushing the branch, opening the pull request and the `update-visual-baselines`
+  run are outward actions, so they are not done here.
+* The GitHub and npm settings are listed in section 6 and in the final report.
 
 ---
 
