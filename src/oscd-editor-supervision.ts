@@ -391,6 +391,13 @@ export default class OscdEditorSupervision extends ScopedElementsMixin(
         flex-direction: column;
         height: 100%;
         min-height: 0;
+        /*
+         * The plugin paints the theme surface itself. Without this it shows the
+         * host page through it, which makes the background white in a light
+         * page and hides the theme's surface (and the dialog scrim then dims
+         * that foreign colour).
+         */
+        background-color: var(--md-sys-color-surface);
         font-family: var(--oscd-text-font);
         color: var(--md-sys-color-on-surface);
       }
