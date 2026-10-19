@@ -795,6 +795,33 @@ design.
 * The orchestrator playbook points at the new repository.
 * No code, test or behaviour change.
 
+### Row layout, sorting and issues #8 and #11 (2026-10-20)
+
+* A used row shows `supervision --> IED > CB` in the main text, with the control
+  block in a tinted box, and `supervision description --> control block
+  description` in the second line. Descriptions cascade (`LDevice > LN > St`,
+  `LDevice > LN0 > CB`) and are left out when absent.
+* The header has a sort button with four orders: document order (default),
+  supervision description, control block name, control block description. The
+  icon shows the primary colour when the order is not the document order. The
+  order applies to the used rows, the available rows and the control block list.
+* **First IED:** the default was the first IED in document order, which is
+  `SMV_Publisher` and therefore the **last** row of the alphabetically sorted IED
+  dialog. The IED list is now sorted by name before the default is chosen, so
+  the first row of the selector is selected.
+* **Issue #8 (scl-lib integration):** the plugin uses scl-lib v2 for references,
+  editability, instantiation and removal, and its unit tests cover them.
+  Deleting a supervision no longer goes through `removeSupervision`, which
+  refuses when `setSrcRef` is not editable: a delete is a plain `Remove` of the
+  LN, so it always removes the LN. Only the first LN of a kind is protected.
+* **Issue #11 (reverse sorting):** the IED selector, the control block list and
+  the default control block order are ascending by name. Tests assert the order.
+
+Verification: `npm run lint`, `npx tsc --noEmit`, `npm test` (135 tests,
+coverage 96.7 % statements) and `npm run build` pass. The two new screenshot
+states are `with the sort dialog open` and `with a non-default sort order`; the
+documentation links to their baselines with `sort-menu.png` and `sort-active.png`.
+
 ### Visual hierarchy (2026-10-20)
 
 The supervised control block was only in the supporting text of a supervision
