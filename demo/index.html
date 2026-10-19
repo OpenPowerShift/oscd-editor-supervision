@@ -1,50 +1,59 @@
-<!DOCTYPE html>
-<title>oscd-supervision Demo</title>
-<link
-  rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300&family=Roboto:wght@300;400;500&display=swap"
-/>
-<link
-  rel="stylesheet"
-  href="https://fonts.googleapis.com/css?family=Material+Icons&display=block"
-/>
-<link
-  href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
-  rel="stylesheet"
-/>
-<!-- tag::plugins[] -->
-<open-scd
-  plugins='{
-  "menu": 
-  [
-    {"name": "Open File", "translations": {"de": "Datei öffnen"}, "icon": "folder_open", "active": true, "src": "https://openscd.github.io/oscd-open/oscd-open.js"}, 
-    {"name": "Save File", "translations": {"de": "Datei speichern"}, "icon": "save", "active": true, "src": "https://openscd.github.io/oscd-save/oscd-save.js"}
-  ],
-  "editor": 
-  [
-    {"name": "Supervision", "translations": {"de": "Überwachung", "pt":"Supervisão"},  "icon": "ecg", "active": true, "src": "/dist/oscd-supervision.js"}
-  ]
-}'
-></open-scd>
-<!-- end::plugins[] -->
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Supervision demo</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300&family=Roboto:wght@300;400;500&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Material+Symbols+Outlined&display=block"
+    />
+    <style>
+      * {
+        --oscd-theme-text-font: 'Roboto';
+        --oscd-theme-icon-font: 'Material Symbols Outlined';
 
-<script type="module">
-  import '@openscd/open-scd-core/open-scd.js';
+        margin: 0px;
+        padding: 0px;
+      }
 
-  const editor = document.querySelector('open-scd');
-  const params = new URL(document.location).searchParams;
-  for (const [name, value] of params) {
-    editor.setAttribute(name, value);
-  }
-</script>
-<style>
-  * {
-    margin: 0px;
-    padding: 0px;
-    --mdc-icon-font: 'Material Symbols Outlined';
-  }
+      /* the shell lays itself out as a grid, so only its height is set */
+      oscd-shell {
+        height: 100vh;
+      }
 
-  body {
-    background: white;
-  }
-</style>
+      body {
+        background: white;
+      }
+    </style>
+  </head>
+  <body>
+    <oscd-shell></oscd-shell>
+
+    <script type="module">
+      // scoped registries must be polyfilled before any element is defined
+      import '@webcomponents/scoped-custom-element-registry';
+      import '@omicronenergy/oscd-shell/oscd-shell.js';
+      import { definePlugins, plugins } from './plugins.js';
+
+      const shell = document.querySelector('oscd-shell');
+      definePlugins(shell.registry);
+      shell.plugins = plugins;
+
+      const params = new URL(document.location.href).searchParams;
+      for (const [name, value] of params) {
+        shell.setAttribute(name, value);
+      }
+
+      const sample = await fetch('sample.scd').then(response => response.text());
+      shell.docs = {
+        'sample.scd': new DOMParser().parseFromString(sample, 'application/xml')
+      };
+      shell.docName = 'sample.scd';
+    </script>
+  </body>
+</html>
