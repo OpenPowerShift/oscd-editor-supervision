@@ -405,8 +405,8 @@ name `oscd-editor-supervision`, title *Supervision*.
 | Step | Description | Status |
 |---|---|---|
 | 0 | Plan (`docs/plan.md`), questions | **done** |
-| 1 | Tooling: `@omicronenergy/oscd-tooling`, ESM, `rootDir: ./src`, remove local configs and Husky, `files`, `.gitattributes`, release-please files, remove stale artifacts, drop the old suite and baselines | in progress |
-| 2 | Foundation: `src/foundation/*`, scl-lib v2, EditV2 (`docVersion`), unit specs, new test host, delete the old integration suite | pending |
+| 1 | Tooling: `@omicronenergy/oscd-tooling`, ESM, `rootDir: ./src`, remove local configs and Husky, `files`, `.gitattributes`, release-please files, remove stale artifacts, drop the old suite and baselines | done |
+| 2 | Foundation: `src/foundation/*`, scl-lib v2, EditV2 actions, unit specs | in progress |
 | 3 | UI: oscd-ui components, scoped elements, `msg()`, theming, sizing, empty states, per-row actions, component specs | pending |
 | 4 | Demo: `oscd-shell`, `demo/plugins.js`, `demo/sample.scd`, open/save menu plugins | pending |
 | 5 | Tests: driver and plugin helpers, component specs, screenshot tests, coverage thresholds | pending |
@@ -502,7 +502,77 @@ worklog.
 | `npm test` | 1 test, 1.9 s, pass |
 | `npm run bundle` | plugin bundle pass; demo bundle fails (see above) |
 
-### Step 2–8
+### Step 2 — Foundation modules
+
+**Added** (`src/foundation/`)
+
+* `control-type.ts` — `ControlType`, `controlTag`, `supervisionLnClass`,
+  `supervisionRefName`, `controlTypeName`.
+* `sort.ts` — `collator` and `compareNames` with numeric collation (L23).
+* `control-block.ts` — reference through scl-lib `controlBlockObjRef`, path,
+  name, description, dataset, id, and `controlBlocksOfOtherIeds` (L8, L21).
+* `supervision.ts` — nodes, reference (trimmed), path, description,
+  `firstSupervisionLn` in document order (Q3), `isSupervisionEditable` through
+  scl-lib `isSrcRefEditable`, `isModificationAllowed`, `maxSupervisions`
+  (undefined when the IED declares no service), `canCreateSupervision`,
+  `canDeleteSupervision`.
+* `subscription.ts` — subscribed references resolved by the control block the
+  `ExtRef` resolves to, so an `ExtRef` without `serviceType` counts (L9); no
+  placeholder values.
+* `model.ts` — one `buildModel(doc, ied, controlType)` per document version,
+  with `used` / `available` / `controlBlocks` / `assignable` and the counts.
+* `actions.ts` — `assignSupervisionEdit` (one edit: `SetTextContent` on the
+  existing `Val`, or scl-lib creating the missing `DOI`/`DAI`/`Val`) (L7),
+  `createAndAssignSupervisionEdit`, `disconnectSupervisionEdit`,
+  `deleteSupervisionEdit`, `createSupervisionLnEdit` (copies `prefix`, chooses
+  `inst` within the LDevice, inserts after the last LN) (L10, L11, L12).
+* `rows.ts` — `visibleSupervisions`, `visibleControlBlocks` for the search.
+* `search.ts` — `getSearchRegex`, tokenizer rewritten so a bare term is not
+  merged with a following quoted phrase (L19).
+* Specs: `search.spec.ts`, `sort.spec.ts`, `control-block.spec.ts`,
+  `supervision.spec.ts`, `model.spec.ts`, `actions.spec.ts`, `rows.spec.ts`.
+* `src/testing/fixtures.ts`, `src/testing/scl.ts` (`applyEdit`, `ied`).
+
+**Removed**
+
+* The single smoke spec `src/oscd-editor-supervision.spec.ts` from Step 1. It
+  only imported the legacy component, and `@openscd/open-scd-core` keeps the
+  browser page alive, which made the runner wait for its finish timeout. A
+  component spec returns in Step 3 with the new component.
+* `compareNames` and `minAvailableLogicalNodeInstance` from
+  `foundation/foundation.ts` were replaced by `sort.ts` and scl-lib
+  `lnInstGenerator`; the legacy copies stay temporarily because the legacy
+  component imports them (deleted in Step 3).
+
+**Problems found and fixed**
+
+* **A failing `expect(edit).to.equal(null)` hung the test page.** Chai formats
+  the actual value for the failure message; formatting an edit that carries an
+  SCL `Element` walks the whole document and never returns. Two real defects
+  were hiding behind it: `createAndAssignSupervisionEdit` was called without a
+  maximum check, and `createSupervisionLnEdit` used scl-lib `getReference`,
+  which returns the *first* `LN`, not the position after the last one. Both are
+  fixed (`canCreateSupervision` guard, last-LN reference) and the specs assert
+  `edit === null` so a failure cannot format a DOM node again.
+* `canRemoveSupervision` is not exported from the scl-lib root; editability uses
+  the deep import `@openscd/scl-lib/dist/tLN/supervision/foundation.js`
+  (`isSrcRefEditable`), like `createElement`.
+* `web-test-runner.config.js` extends the shared config (unit group only counts
+  for coverage, visual group Chromium with local fonts, `SPEC=...` runs one
+  spec). Coverage thresholds are left for Step 5.
+* Test suite: `npm test` runs 79 tests in ~3 s. The earlier hangs were the chai
+  formatting defect above, not the runner.
+
+**Verification**
+
+| Command | Result |
+|---|---|
+| `npm run lint` | 0 errors, 11 TSDoc warnings (legacy files, Step 3/7) |
+| `npx tsc --noEmit` | pass |
+| `npm run build` | pass |
+| `npm test` | 79 tests, 3 s, pass, coverage 93.07 % statements |
+
+### Step 3–8
 
 To be written as each step completes, with the commit hashes, the exact
 commands run and their results, and the problems found. Written so that the same

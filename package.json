@@ -50,7 +50,9 @@
     "@material/mwc-textfield": "^0.27.0",
     "@openenergytools/scl-lib": "^0.12.1",
     "@openscd/open-scd-core": "^0.0.2",
+    "@openscd/oscd-api": "^0.1.6",
     "@openscd/oscd-filtered-list": "^1.1.1",
+    "@openscd/scl-lib": "^2.0.1",
     "lit": "^3.1.0",
     "tslib": "^2.8.1"
   },
