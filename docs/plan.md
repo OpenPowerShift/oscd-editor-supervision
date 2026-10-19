@@ -409,8 +409,8 @@ name `oscd-editor-supervision`, title *Supervision*.
 | 2 | Foundation: `src/foundation/*`, scl-lib v2, EditV2 actions, unit specs | done |
 | 3 | UI: oscd-ui components, scoped elements, `msg()`, theming, sizing, empty states, per-row actions, component specs | done |
 | 4 | Demo: `oscd-shell`, `demo/plugins.js`, `demo/sample.scd`, open/save menu plugins | done |
-| 5 | Tests: driver and plugin helpers, component specs, screenshot tests, coverage thresholds | in progress |
-| 6 | CI and release: `test.yml`, `update-visual-baselines.yml`, `release.yml`, delete old workflows, YAML validation | pending |
+| 5 | Tests: driver and plugin helpers, component specs, screenshot tests, coverage thresholds | done |
+| 6 | CI and release: `test.yml`, `update-visual-baselines.yml`, `release.yml`, delete old workflows, YAML validation | in progress |
 | 7 | Docs: move to `docs/`, rewrite pages, symlinks, orchestrator playbook, Antora verification | pending |
 | 8 | Final checks: lint, tsc, build, test, bundle, pack, legacy grep, empty-file check, demo in Playwright, report | pending |
 
@@ -691,7 +691,36 @@ worklog.
 | `npm test` | 116 tests, 7.6 s, pass, thresholds met (statements 96.7 %) |
 | `npm run test:visual` | runs all 12 states, fails without baselines (expected) |
 
-### Step 6–8
+### Step 6 — CI and release
+
+**Changed**
+
+* `test.yml` — new: `push` with `branches-ignore: [main]`, `pull_request` and
+  `workflow_call` with a `visual` boolean. `unit` runs `npm run lint`, the
+  documentation image check (`find docs -xtype l`), Chromium, `npm test` and
+  uploads coverage; `visual` runs on pull requests or when `visual` is true.
+* `update-visual-baselines.yml` — new, copied from the reference: on the
+  `update-visual-baselines` label or by hand, runs `npx oscd test --update`,
+  commits `test/screenshots/baseline` and removes the label.
+* `release.yml` — new, named "Release and deploy": `test` calls `test.yml` with
+  `visual: true`; `release-please` needs `test` and uses
+  `secrets.RELEASE_PLEASE_TOKEN`; `npm-publish` needs `release-please`, runs only
+  when a release is created, and publishes with npm Trusted Publishing;
+  `deploy` needs `test` and publishes `dist` to the `gh-pages` branch with
+  `JamesIves/github-pages-deploy-action@v4`.
+* Deleted `deploy.yml` and `test-on-pr-branch.yml`. Nothing is released or
+  deployed unless `test` passes.
+* Actions are `actions/checkout@v4`, `actions/setup-node@v4` with Node 22,
+  `actions/cache@v4`, `actions/upload-artifact@v4`.
+
+**Verification**
+
+| Command | Result |
+|---|---|
+| YAML parse of the three workflows (`python3 -c "import yaml"`) | all three parse |
+| `npm pack --dry-run` | 51 files; no `*.spec.*`, `*.test.*`, `dist/testing` or `dist/demo`; `dist/oscd-editor-supervision.js` included |
+
+### Step 7–8
 
 To be written as each step completes, with the commit hashes, the exact
 commands run and their results, and the problems found. Written so that the same
