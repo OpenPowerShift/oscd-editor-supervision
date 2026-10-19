@@ -53,7 +53,7 @@ export class ControlBlockList extends ScopedElementsMixin(LitElement) {
       .filter(part => !!part)
       .join(' - ');
     const headline = `${row.name}${
-      row.ownDescription ? ` - ${row.ownDescription}` : ''
+      row.description ? ` - ${row.description}` : ''
     }`;
     return html`<oscd-list-item
       type="button"

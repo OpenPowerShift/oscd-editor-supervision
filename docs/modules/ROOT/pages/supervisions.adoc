@@ -10,8 +10,13 @@ The control block is in a tinted box, so that it is easy to tell the two apart.
 
 The second line shows the description of the supervision, then the description
 of the control block, for example `Important1 > Important2 --> Trip`.
-A description is a cascade: the logical device, the logical node and the data
-object, joined with a `>`. A missing description is left out.
+
+The supervision description is the `desc` of the logical node and the `desc` of
+its `St` data, or the `d` value inside it, joined with a `>`.
+The control block description is the `desc` of the control block.
+The descriptions of the parents are not shown: they usually repeat the name and
+the path, and add no information.
+A missing description is left out.
 
 A control block row in the control block list shows the IED and the control
 block in the main text, and the path, the descriptions, the data set and the id

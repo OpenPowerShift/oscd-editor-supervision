@@ -843,6 +843,10 @@ document order. `sort-button.spec.ts` asserts the computed icon colour.
   LN, so it always removes the LN. Only the first LN of a kind is protected.
 * **Issue #11 (reverse sorting):** the IED selector, the control block list and
   the default control block order are ascending by name. Tests assert the order.
+* **Descriptions:** a control block row shows only the control block's own
+  `desc`, not the `desc` of its `LDevice` and `LN0`. Those usually repeat the
+  name or path (for example `HVCB`, `LLN0`), which was visual noise. A
+  supervision description remains its own `desc` plus its `St` description.
 
 Verification: `npm run lint`, `npx tsc --noEmit`, `npm test` (135 tests,
 coverage 96.7 % statements) and `npm run build` pass. The two new screenshot

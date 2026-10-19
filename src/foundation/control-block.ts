@@ -15,10 +15,8 @@ export interface ControlBlockInfo {
   name: string;
   /** `LDInst/LNName`, for the list subtitle. */
   path: string;
-  /** The cascade: LDevice, LN0 and control block descriptions. */
+  /** The `desc` of the control block itself. */
   description?: string;
-  /** The `desc` of the control block itself, for the row heading. */
-  ownDescription?: string;
   dataset?: string;
   id?: string;
   /** The text the search field looks at. */
@@ -78,22 +76,16 @@ export function controlBlockName(controlBlock: Element): string {
 }
 
 /**
- * The cascaded description of a control block, from the `desc` of its `LDevice`,
- * its `LN0` and the control block itself, joined with ` > `.
+ * The description of a control block. Only its own `desc` is used: the `desc` of
+ * its `LDevice` and `LN0` usually repeats their name, which adds no information
+ * and repeats the path.
  * @param controlBlock - the control block.
- * @returns the description, or undefined when neither is set.
+ * @returns the description, or undefined when it is not set.
  */
 export function controlBlockDescription(
   controlBlock: Element
 ): string | undefined {
-  const logicalDevice = controlBlock.closest('LDevice');
-  const ln0 = controlBlock.closest('LN0');
-  const descriptions = [
-    logicalDevice ? getDescriptionAttribute(logicalDevice) : undefined,
-    ln0 ? getDescriptionAttribute(ln0) : undefined,
-    getDescriptionAttribute(controlBlock)
-  ].filter(description => !!description);
-  return descriptions.length > 0 ? descriptions.join(' > ') : undefined;
+  return getDescriptionAttribute(controlBlock);
 }
 
 /**
@@ -111,7 +103,6 @@ export function controlBlockInfo(
   const dataset = controlBlock.getAttribute('datSet') || undefined;
   const id = controlBlockId(controlBlock);
   const description = controlBlockDescription(controlBlock);
-  const ownDescription = getDescriptionAttribute(controlBlock);
   const info: ControlBlockInfo = {
     element: controlBlock,
     reference,
@@ -121,9 +112,6 @@ export function controlBlockInfo(
   };
   if (description) {
     info.description = description;
-  }
-  if (ownDescription) {
-    info.ownDescription = ownDescription;
   }
   if (dataset) {
     info.dataset = dataset;

@@ -71,7 +71,7 @@ describe('sortSupervisions', () => {
     const model = buildModel(doc, ied(doc, 'GOOSE_Subscriber1'), 'GOOSE');
     expect(
       sortSupervisions(model.used, 'control-description').map(
-        row => row.controlBlock?.ownDescription
+        row => row.controlBlock?.description
       )
     ).to.deep.equal(['A', 'B']);
   });
@@ -110,7 +110,7 @@ describe('sortControlBlocks', () => {
     const model = buildModel(doc, ied(doc, 'GOOSE_Subscriber4'), 'GOOSE');
     expect(
       sortControlBlocks(model.assignable, 'control-description').map(
-        row => row.ownDescription
+        row => row.description
       )
     ).to.deep.equal(['A', 'B']);
   });

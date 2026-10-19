@@ -62,13 +62,12 @@ describe('control-block', () => {
     );
   });
 
-  it('cascades the descriptions of the LDevice, the LN0 and the control block', () => {
+  it('uses only the description of the control block, not its parents', () => {
     const controlBlock = doc.querySelector('GSEControl[name="GOOSE2"]')!;
     controlBlock.setAttribute('desc', 'Trip');
-    controlBlock.closest('LN0')!.setAttribute('desc', 'Disconnector');
-    expect(controlBlockDescription(controlBlock)).to.equal(
-      'Disconnector > Trip'
-    );
+    controlBlock.closest('LN0')!.setAttribute('desc', 'LLN0');
+    controlBlock.closest('LDevice')!.setAttribute('desc', 'HVCB');
+    expect(controlBlockDescription(controlBlock)).to.equal('Trip');
   });
 
   it('has no description when neither is set', () => {
@@ -83,7 +82,6 @@ describe('control-block', () => {
       doc.querySelector('GSEControl[name="GOOSE2"]')!
     )!;
     expect(info.name).to.equal('GOOSE_Publisher > GOOSE2');
-    expect(info.ownDescription).to.equal(undefined);
     expect(info.dataset).to.equal('GOOSE2sDataSet');
     expect(info.id).to.equal('GOOSE2');
     expect(info.searchText).to.contain('GOOSE_Publisher > GOOSE2');
@@ -100,8 +98,7 @@ describe('control-block', () => {
     const controlBlock = doc.querySelector('GSEControl[name="GOOSE2"]')!;
     controlBlock.setAttribute('desc', 'Trip');
     const info = controlBlockInfo(controlBlock)!;
-    expect(info.ownDescription).to.equal('Trip');
-    expect(info.description).to.contain('Trip');
+    expect(info.description).to.equal('Trip');
   });
 
   it('offers the control blocks of the other IEDs only', () => {
