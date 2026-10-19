@@ -1,6 +1,6 @@
 # oscd-supervision upgrade plan
 
-Status: **plan for review — no implementation started**
+Status: **approved 2026-10-19** — implementation in progress
 Branch: `upgrade` (created from `main` at `7526cd1`, 2024-09-26)
 Date: 2026-10-19
 
@@ -17,7 +17,7 @@ approving.
 |---|---|
 | Remote | `https://github.com/danyill/oscd-supervision` (the `OpenPowerShift/...` URL in the brief does not exist: it returns 404) |
 | Branch | `main` at `7526cd1` "docs: Improve image links" |
-| Package name | `oscd-supervision`, version `0.0.0`, **never published** (`npm view oscd-supervision` → 404) |
+| Package name | `oscd-supervision`, version `0.0.0`, **never published** (`npm view oscd-supervision` → 404). Target name: `oscd-editor-supervision` (Q1) |
 | Entry point | `oscd-supervision.ts`, a single 1487-line class with no `customElements.define` (the host defines the tag from the module's default export) |
 | Tracked files | 120, including 64 PNG baselines (5.8 MB) and a stale `custom-elements.json` |
 
@@ -124,7 +124,7 @@ rollup.config.js      thin extension of the shared config (plugin + demo)
 release-please-config.json, .release-please-manifest.json
 .gitattributes        test/**/*.png binary
 src/
-  oscd-supervision.ts          root component: state and orchestration only
+  oscd-editor-supervision.ts   root component: state and orchestration only
   theme.ts                     oscdMd3Mappings -> internal --oscd-* palette
   components/
     ied-selector.ts            IED button + selection dialog + current IED heading
@@ -154,7 +154,7 @@ docs/antora.yml, docs/modules/ROOT/{nav.adoc,pages,partials,images}
 
 | Component | Responsibility | Sibling spec |
 |---|---|---|
-| `oscd-supervision` | Owns `doc`, `docName`, `docVersion`, `controlType`, `selectedIedName`, `selectedControl`, `selectedSupervision`; builds the model; dispatches one EditV2 event per user action; renders header and both sections | `oscd-supervision.spec.ts` (orchestration, sizing, empty states, edit dispatch) |
+| `oscd-editor-supervision` | Owns `doc`, `docName`, `docVersion`, `controlType`, `selectedIedName`, `selectedControl`, `selectedSupervision`; builds the model; dispatches one EditV2 event per user action; renders header and both sections | `oscd-editor-supervision.spec.ts` (orchestration, sizing, empty states, edit dispatch) |
 | `ied-selector` | Button with the current IED, dialog with a single-select list of IEDs (name, type, manufacturer, description) | `ied-selector.spec.ts` |
 | `supervision-table` | One row per supervision: name, path, description, status (assigned/invalid/not subscribed), control block, and labelled actions (assign, disconnect, delete) | `supervision-table.spec.ts` |
 | `available-supervisions` | Search, list of unassigned supervision LNs, "New LGOS/LSVS supervision" item, create button with remaining count | `available-supervisions.spec.ts` |
@@ -201,7 +201,7 @@ misleading behaviour; **L** = cosmetic or robustness.
 | L10 | **M** | Creating an empty supervision LN picks `inst` as the minimum free value across the **whole IED** (`minAvailableLogicalNodeInstance` over all LNs of that class, `foundation/subscription/subscription.ts:110-121`), but `inst` must be unique **within its LDevice**. With `LGOS 1,2` in one LDevice and `LGOS 1,2` in another, the new LN gets `3` and a free `1`/`2` is skipped; scl-lib's generator is per LDevice. | Compute `inst` within the target LDevice (or reuse scl-lib's `instantiateSubscriptionSupervision` with `newSupervisionLn`). |
 | L11 | **M** | A new LN loses the `prefix` of the supervision type (`createNewSupervisionLnInst` copies only `lnType`; scl-lib copies `prefix` too). An IED that uses `prefix="S"` gets an LN outside its instance namespace. | Copy `prefix` from the template LN. |
 | L12 | **M** | The insert reference for a new LN is `parent.querySelector('LN[lnClass="LGOS"]:last-child')?.nextElementSibling ?? null` (`foundation/subscription/subscription.ts:152-158`). `:last-child` requires the LN to be the parent's last child; otherwise the reference is `null` and the host appends the LN after `AccessControl`, which is schema-invalid order. | Use the last matching LN's `nextElementSibling`, or scl-lib `getReference(parent, 'LN')`. |
-| L13 | **M** | The "first supervision cannot be deleted" rule (`renderDeleteIcons:680-683`) uses the first LN in *identity sort order* across all LDevices. It can block a used supervision in one LDevice while allowing deletion of the true template LN in another. The rule's purpose (keep a template for new LNs) is real but the implementation is not. | Refuse deletion of the last supervision LN of the class in the IED (the template scl-lib needs), computed in document order; explain it in the tooltip. See Q3. |
+| L13 | **M** | The "first supervision cannot be deleted" rule (`renderDeleteIcons:680-683`) uses the first LN in *identity sort order* across all LDevices. It can block a used supervision in one LDevice while allowing deletion of the true template LN in another. The rule's purpose (keep a template for new LNs) is real but the implementation is not. | Refuse deletion of the first supervision LN of the class in the IED, in **document order** (Q3); explain it in the tooltip. Every other LN can be deleted. |
 | L14 | **M** | When the selected IED disappears (removed by another plugin or by undo), `selectedIed` returns `undefined` and the whole lower section vanishes, although the comment at `:371-373` says the first IED is selected instead. | Fall back to the first IED of the document, or show an explicit empty state. |
 | L15 | **M** | Large documents: `getSubscribedCBRefs` calls scl-lib `sourceControlBlock` for every `ExtRef` of the IED, and that function runs a document-wide `querySelector` per call; `getOtherIedControlElements` scans every `LN0 > *Control` in the document; `render` recomputes and re-sorts the supervision list at least four times. `updateCBRefInfo` runs on every edit. With 1000 IEDs or 5000 ExtRefs this is seconds per edit. | One `buildModel` per document version: index control blocks by object reference once, map ExtRefs by attributes, sort once. Cache on `(doc, docVersion, ied, controlType)`. |
 | L16 | **M** | The plugin cannot be used at all when the IED has no `Services > SupSubscription`, but the UI only hides the lower section when the supervision LN is not editable. Everything is then disabled with no explanation. | Separate "no template LN", "not editable (`valImport`/`valKind`)" and "no `SupSubscription`" states, each with its own message and a link to the docs page. |
@@ -307,7 +307,7 @@ One spec per module in section 2.3, with a table-driven case list. Cover:
 * Parent spec checks orchestration only: which child event produces which edit,
   document replacement, undo/redo refresh, and the 600 px sizing rule.
 
-### 5.3 Screenshot tests (`src/oscd-supervision.test.ts`)
+### 5.3 Screenshot tests (`src/oscd-editor-supervision.test.ts`)
 
 One screenshot per important state (Chromium only):
 
@@ -353,9 +353,9 @@ row is inside the captured area; fonts from `node_modules`.
 |---|---|
 | `.github/workflows/test.yml` | `push` with `branches-ignore: [main]`, `pull_request`, `workflow_call` with `visual` boolean. `unit` job: checkout v4, Node 22, `npm ci`, `npm run lint`, docs image check (`find docs -xtype l`), Playwright cache, `npx playwright install --with-deps chromium`, `npm test`, upload coverage. `visual` job on PR or `visual: true`: `npm run test:visual`, failure hint about the label, upload `test/screenshots/failed`. |
 | `.github/workflows/update-visual-baselines.yml` | Copied from the reference: `workflow_dispatch` and `pull_request: [labeled]`, guard for forks, `npx oscd test --update`, commit `test/screenshots/baseline`, remove the label. |
-| `.github/workflows/release.yml` | "Release and deploy": `test` calls `test.yml` with `visual: true`; `release-please` needs `test`, uses `secrets.RELEASE_PLEASE_TOKEN`; `npm-publish` needs `release-please`, runs on `release_created`, `id-token: write`, latest npm, `npm publish --access public`; `deploy` needs `test`, `contents: write`, `npm run bundle`, deploys `dist` to the `gh-pages` branch. |
+| `.github/workflows/release.yml` | "Release and deploy": `test` calls `test.yml` with `visual: true`; `release-please` needs `test`, uses `secrets.RELEASE_PLEASE_TOKEN`; `npm-publish` needs `release-please`, runs on `release_created`, `id-token: write`, latest npm, `npm publish --access public`; `deploy` needs `test`, `contents: write`, `npm run bundle`, `JamesIves/github-pages-deploy-action@v4` to the `gh-pages` branch (Q2). |
 | deleted | `deploy.yml`, `test-on-pr-branch.yml` |
-| `release-please-config.json` | `bootstrap-sha: 7526cd1b46d90d6040b5bac93a8f8b5d29cb4266`, `release-type: node`, `package-name` per Q1 |
+| `release-please-config.json` | `bootstrap-sha: 7526cd1b46d90d6040b5bac93a8f8b5d29cb4266`, `release-type: node`, `package-name: oscd-editor-supervision` |
 | `.release-please-manifest.json` | `{ ".": "0.0.0" }` |
 | `.gitattributes` | `test/**/*.png binary` |
 
@@ -367,7 +367,7 @@ workflow: nothing is released or deployed unless `test` passes.
 ## 7. Documentation plan
 
 Move `antora.yml` and `modules/` into `docs/` with `git mv`. Antora component
-name `oscd-supervision`, title *Supervision*.
+name `oscd-editor-supervision`, title *Supervision*.
 
 | Page | Content | Screenshots |
 |---|---|---|
@@ -404,7 +404,7 @@ name `oscd-supervision`, title *Supervision*.
 
 | Step | Description | Status |
 |---|---|---|
-| 0 | Plan (`docs/plan.md`), questions | **in review** |
+| 0 | Plan (`docs/plan.md`), questions | **done** |
 | 1 | Tooling: `@omicronenergy/oscd-tooling`, ESM, `rootDir: ./src`, remove local configs and Husky, `files`, `.gitattributes`, release-please files, remove stale artifacts | pending |
 | 2 | Foundation: `src/foundation/*`, scl-lib v2, EditV2 (`docVersion`), unit specs, new test host, delete the old integration suite | pending |
 | 3 | UI: oscd-ui components, scoped elements, `msg()`, theming, sizing, empty states, per-row actions, component specs | pending |
@@ -422,7 +422,7 @@ worklog.
 
 ## 9. Worklog
 
-### Step 0 — Plan (in review)
+### Step 0 — Plan (done)
 
 * Read the plugin, its fixtures and its tests; the reference repositories
   (`oscd-editor-subscriber-later-binding` for tooling, CI, tests and docs;
@@ -437,7 +437,12 @@ worklog.
 * Found the duplicate `LGOS inst="3"` in `GOOSE_Subscriber4` of the fixture,
   which exposes the identity round-trip in L3.
 * No code written. No dependency installed. Branch `upgrade` created from
-  `main`; nothing committed.
+  `main`.
+* Commit `398a2c3 docs: add the upgrade plan`.
+* Questions answered 2026-10-19: package `oscd-editor-supervision`; deploy per
+  the reference (`gh-pages`); the first supervision in document order cannot be
+  deleted; drop the CEM; delete the old baselines and stop using Git LFS; commit
+  without signing for now; orchestrator uses `start_path: docs`.
 
 ### Step 1–8
 
@@ -449,15 +454,17 @@ work can be repeated on a similar plugin.
 
 ## 10. Questions for you
 
-Answer these before I write code. My recommendation is in brackets.
+**Answered 2026-10-19. All seven decisions are applied below and in the plan.**
 
 **Q1. Package name and scope.** The repository is `danyill/oscd-supervision` and
 the package is unpublished. Publish as `oscd-supervision` (matches the repo and
 the current `name`), or as `@openpowershift/oscd-supervision` (matches the
 reference plugins and the `OpenPowerShift/...` URL in the brief)? This sets
 `package-name` in `release-please-config.json`, the docs URLs and the npm
-trusted-publisher settings. [Recommend `oscd-supervision`, unscoped, unless the
-repository is moving to OpenPowerShift at the same time.]
+trusted-publisher settings.
+**Decision: `oscd-editor-supervision`, unscoped.** Entry point
+`src/oscd-editor-supervision.ts`, bundle `dist/oscd-editor-supervision.js`. The
+repository stays `danyill/oscd-supervision`.
 
 **Q2. Deploy target.** The brief asks for `upload-pages-artifact@v3` +
 `deploy-pages@v4` *and* for "GitHub Pages from the `gh-pages` branch". These are
@@ -466,6 +473,9 @@ branch with `JamesIves/github-pages-deploy-action@v4`. Keep that (Pages source =
 `gh-pages` branch), or switch to Pages-from-Actions (Pages source = GitHub
 Actions)? [Recommend keeping `gh-pages`, as the reference does and as the
 settings list says.]
+**Decision: follow the reference.** `deploy` in `release.yml` uses
+`JamesIves/github-pages-deploy-action@v4` to the `gh-pages` branch. No
+`deploy-pages`, no separate `deploy.yml`.
 
 **Q3. The "first supervision cannot be deleted" rule.** The rule exists because
 scl-lib copies `lnType`/`prefix` from the first supervision LN to create new
@@ -473,25 +483,33 @@ ones. Today it blocks the first LN in sort order, which can be the wrong one.
 Options: (a) block the last supervision LN of the class in the IED, so a
 template always remains and any other LN can be deleted; (b) block the first LN
 in document order; (c) allow all deletions and disable creation when no
-template remains. [Recommend (a). It keeps the invariant, allows deleting used
-supervisions that are not the template, and is explainable in one tooltip.]
+template remains.
+**Decision: (b) the first supervision in document order cannot be deleted.**
+This is the LN scl-lib copies `lnType` and `prefix` from. The tooltip names it.
+Any other LN can be deleted.
 
 **Q4. `custom-elements.json`.** It is tracked and stale. The reference keeps no
 CEM. Keep it (run `oscd analyze` in CI) or drop it and the `customElements`
-field? [Recommend drop: nothing consumes it, and the plugin is consumed as a
-bundle.]
+field?
+**Decision: drop.** Delete `custom-elements.json` and the `customElements`
+field; do not run `oscd analyze`.
 
 **Q5. Old baselines.** The UI is rewritten, so all 64 baselines and the old
 integration suite are obsolete. Delete them in the same commit that adds the new
-screenshot tests? [Recommend yes. CI regenerates the new Chromium-only
-baselines when the PR gets the `update-visual-baselines` label.]
+screenshot tests?
+**Decision: yes, and stop using Git LFS.** The old suite and all 64 baselines are
+deleted. Baselines are normal Git files (`.gitattributes`: `test/**/*.png
+binary`). CI regenerates Chromium-only baselines when the PR gets the
+`update-visual-baselines` label.
 
 **Q6. Signing.** You asked me to commit without signing for now. I will use
 `git -c commit.gpgsign=false commit` per commit and leave your global
-`commit.gpgsign=true` untouched, so the later re-signing is a rebase with
-signing on. Confirm that is what you want.
+`commit.gpgsign=true` untouched, so the later re-signing is a rebase with signing on.
+**Decision: confirmed.** Every commit uses `git -c commit.gpgsign=false`; global
+signing stays on for the later re-sign.
 
 **Q7. Documentation orchestrator.** The playbook currently has no `start_path`
 for this plugin and uses `danyill/oscd-supervision` with `[main, v*]`. After the
 upgrade I will set `start_path: docs` and branch `upgrade` until it is merged.
-Confirm, and confirm the repository URL from Q1.
+**Decision: confirmed.** `start_path: docs`, branch `upgrade` until merged, then
+`[main, v*]`, repository `danyill/oscd-supervision`.
