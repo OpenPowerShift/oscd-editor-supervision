@@ -88,6 +88,13 @@ describe('control-block', () => {
     expect(info.searchText).to.contain('GOOSE_Publisher > GOOSE2');
   });
 
+  it('has no entry for a control block without a reference', () => {
+    const controlBlock = doc.querySelector('GSEControl[name="GOOSE2"]')!;
+    const withoutName = controlBlock.cloneNode(false) as Element;
+    withoutName.removeAttribute('name');
+    expect(controlBlockInfo(withoutName)).to.equal(null);
+  });
+
   it('offers the control blocks of the other IEDs only', () => {
     const blocks = controlBlocksOfOtherIeds(
       doc,

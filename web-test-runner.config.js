@@ -7,14 +7,27 @@ import oscdConfig from '@omicronenergy/oscd-tooling/configs/web-test-runner.conf
 
 import { visualRunnerHtml } from './test/support/visual-runner-html.js';
 
+const groupIndex = process.argv.indexOf('--group');
+const isVisualRun =
+  process.argv.includes('--update-visual-baseline') ||
+  (groupIndex !== -1 && process.argv[groupIndex + 1] === 'visual');
+
 /**
  * Extends the shared oscd-tooling config:
  * - `unit` group: `dist/**\/*.spec.js`, the default `npm test`. Only this group
- *   counts towards coverage; Step 5 sets the thresholds.
+ *   counts towards coverage, which the thresholds below enforce.
  * - `visual` group: screenshot tests, `npm run test:visual`. Baselines are owned
  *   by CI (see `.github/workflows/update-visual-baselines.yml`) and are not
  *   updated locally. Fonts are served from node_modules.
  */
+
+// Thresholds only ever go up. Screenshot tests are not held to them.
+const coverageThreshold = {
+  statements: 95,
+  branches: 90,
+  functions: 95,
+  lines: 95
+};
 
 // Chromium flags which reduce differences in text rendering.
 const visualBrowsers = [
@@ -57,7 +70,7 @@ export default /** @type {import("@web/test-runner").TestRunnerConfig} */ ({
       'dist/**/testing/**',
       'dist/**/demo/**'
     ],
-    threshold: undefined // coverage thresholds are set in Step 5
+    threshold: isVisualRun ? undefined : coverageThreshold
   },
 
   plugins: [

@@ -66,6 +66,32 @@ describe('actions', () => {
     ).to.equal(null);
   });
 
+  it('refuses a control block without a reference', () => {
+    const subscriber = ied(doc, 'GOOSE_Subscriber4');
+    const controlBlock = gooseControl('GOOSE2').cloneNode(false) as Element;
+    controlBlock.removeAttribute('name');
+    expect(
+      assignSupervisionEdit(
+        subscriber,
+        'GOOSE',
+        supervisionLns(subscriber, 'GOOSE')[0],
+        controlBlock
+      )
+    ).to.equal(null);
+  });
+
+  it('refuses to change a supervision whose source reference is not editable', () => {
+    const subscriber = ied(doc, 'GOOSE_Subscriber3');
+    expect(
+      assignSupervisionEdit(
+        subscriber,
+        'GOOSE',
+        supervisionLns(subscriber, 'GOOSE')[0],
+        gooseControl('GOOSE2')
+      )
+    ).to.equal(null);
+  });
+
   it('creates the missing DOI when a supervision has none', () => {
     const subscriber = ied(doc, 'GOOSE_Subscriber5');
     const supervisionLn = supervisionLns(subscriber, 'GOOSE')[0];
@@ -166,6 +192,13 @@ describe('actions', () => {
     if (subscriber.querySelector('LN[lnClass="LGOS"]')) {
       return;
     }
+    expect(createSupervisionLnEdit(subscriber, 'GOOSE')).to.equal(null);
+  });
+
+  it('returns null for a new supervision without a template or a type', () => {
+    const subscriber = ied(doc, 'GOOSE_Subscriber1');
+    const template = supervisionLns(subscriber, 'GOOSE')[0];
+    template.removeAttribute('lnType');
     expect(createSupervisionLnEdit(subscriber, 'GOOSE')).to.equal(null);
   });
 

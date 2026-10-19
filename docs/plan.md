@@ -407,9 +407,9 @@ name `oscd-editor-supervision`, title *Supervision*.
 | 0 | Plan (`docs/plan.md`), questions | **done** |
 | 1 | Tooling: `@omicronenergy/oscd-tooling`, ESM, `rootDir: ./src`, remove local configs and Husky, `files`, `.gitattributes`, release-please files, remove stale artifacts, drop the old suite and baselines | done |
 | 2 | Foundation: `src/foundation/*`, scl-lib v2, EditV2 actions, unit specs | done |
-| 3 | UI: oscd-ui components, scoped elements, `msg()`, theming, sizing, empty states, per-row actions, component specs | in progress |
-| 4 | Demo: `oscd-shell`, `demo/plugins.js`, `demo/sample.scd`, open/save menu plugins | pending |
-| 5 | Tests: driver and plugin helpers, component specs, screenshot tests, coverage thresholds | pending |
+| 3 | UI: oscd-ui components, scoped elements, `msg()`, theming, sizing, empty states, per-row actions, component specs | done |
+| 4 | Demo: `oscd-shell`, `demo/plugins.js`, `demo/sample.scd`, open/save menu plugins | done |
+| 5 | Tests: driver and plugin helpers, component specs, screenshot tests, coverage thresholds | in progress |
 | 6 | CI and release: `test.yml`, `update-visual-baselines.yml`, `release.yml`, delete old workflows, YAML validation | pending |
 | 7 | Docs: move to `docs/`, rewrite pages, symlinks, orchestrator playbook, Antora verification | pending |
 | 8 | Final checks: lint, tsc, build, test, bundle, pack, legacy grep, empty-file check, demo in Playwright, report | pending |
@@ -630,7 +630,68 @@ worklog.
 | `npm test` | 108 tests, 7.6 s, pass, coverage 94.84 % statements |
 | legacy import search in `src/` | no match |
 
-### Step 4–8
+### Step 4 — Demo
+
+**Changed**
+
+* `demo/index.html` is an `oscd-shell` page: the shell, the open and save menu
+  plugins from `@omicronenergy/oscd-menu-open` / `-save`, and the built plugin,
+  with only `height: 100vh` set on the shell. It loads `demo/sample.scd`.
+* `demo/plugins.js` defines the plugins in the shell's scoped registry and
+  declares the menu and editor entries (`ecg` icon, `requireDoc: true`).
+* `demo/sample.scd` is a copy of `test/fixtures/supervisions.scd`.
+* `demo/index.deploy.html` is deleted; `rollup.config.js` is now just the shared
+  bundle config (the plugin and the demo), so nothing is copied separately.
+* Dev dependencies: `@omicronenergy/oscd-shell`, `@omicronenergy/oscd-menu-open`,
+  `@omicronenergy/oscd-menu-save`.
+
+**Verification**
+
+| Command | Result |
+|---|---|
+| `npm run bundle` | pass; `dist/oscd-editor-supervision.js` and `dist/demo/` |
+| Playwright check of `dist/demo/index.html` (script in `/tmp/opencode/check-demo.mjs`) | shell and editor present, editor 730 px tall in an 800 px window, no page scroll, **no console or page errors** |
+
+### Step 5 — Tests
+
+**Added**
+
+* `src/oscd-editor-supervision.test.ts` — 12 screenshot states: LGOS and LSVS
+  initially, the IED dialog open, a supervision selected, no IEDs, no
+  supervisions, not editable, at the maximum, all supervisions assigned, a
+  missing control block, a search without a match, and a check that a selected
+  row is inside the captured area.
+* `src/testing/visual-regression.d.ts` — the `visualDiff` declaration the
+  package's types do not expose (same workaround as the reference).
+* `src/foundation/foundation.spec.ts`; extra cases in `control-block.spec.ts`
+  and `actions.spec.ts` for the refused edits and the last branches.
+* Coverage thresholds in `web-test-runner.config.js`: statements 95, branches
+  90, functions 95, lines 95. Screenshot runs are exempt.
+* Dev dependencies `@fontsource/roboto` and
+  `@fontsource/material-symbols-outlined`; the visual runner page loads the
+  fonts from `node_modules`, so rendering does not depend on the network.
+
+**Removed**
+
+* `src/foundation/foundation.ts` lost the legacy `compareNames` copy (L23), now
+  that the legacy component is gone and `sort.ts` owns it.
+
+**Baselines**
+
+* No baseline is created or committed here. `npm run test:visual` fails with
+  "There was no baseline image to compare against" for the states, as expected;
+  CI owns the baselines and the `update-visual-baselines` workflow creates them.
+
+**Verification**
+
+| Command | Result |
+|---|---|
+| `npm run lint` | pass |
+| `npx tsc --noEmit` | pass |
+| `npm test` | 116 tests, 7.6 s, pass, thresholds met (statements 96.7 %) |
+| `npm run test:visual` | runs all 12 states, fails without baselines (expected) |
+
+### Step 6–8
 
 To be written as each step completes, with the commit hashes, the exact
 commands run and their results, and the problems found. Written so that the same
