@@ -7,7 +7,7 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/danyill/oscd-supervision.git"
+    "url": "git+https://github.com/OpenPowerShift/oscd-editor-supervision.git"
   },
   "main": "dist/oscd-editor-supervision.js",
   "module": "dist/oscd-editor-supervision.js",

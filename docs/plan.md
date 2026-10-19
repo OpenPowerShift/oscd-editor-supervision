@@ -15,7 +15,7 @@ approving.
 
 | Item | Value |
 |---|---|
-| Remote | `https://github.com/danyill/oscd-supervision` (the `OpenPowerShift/...` URL in the brief does not exist: it returns 404) |
+| Remote | `https://github.com/OpenPowerShift/oscd-editor-supervision` (moved from `danyill/oscd-supervision` on 2026-10-20) |
 | Branch | `main` at `7526cd1` "docs: Improve image links" |
 | Package name | `oscd-supervision`, version `0.0.0`, **never published** (`npm view oscd-supervision` → 404). Target name: `oscd-editor-supervision` (Q1) |
 | Entry point | `oscd-supervision.ts`, a single 1487-line class with no `customElements.define` (the host defines the tag from the module's default export) |
@@ -428,8 +428,10 @@ worklog.
   (`oscd-editor-subscriber-later-binding` for tooling, CI, tests and docs;
   `oscd-editor-subscriber-databinding` is cited by the reference but was not
   needed).
-* Confirmed: the `OpenPowerShift/oscd-supervision` URL does not exist; the
-  remote is `danyill/oscd-supervision`. `oscd-supervision` is not on npm.
+* Confirmed: at planning time the `OpenPowerShift/oscd-supervision` URL did not
+  exist; the remote was `danyill/oscd-supervision`. The project moved to
+  `OpenPowerShift/oscd-editor-supervision` on 2026-10-20 and the remote, the
+  package metadata and the documentation URLs now point there.
 * Confirmed: baselines are normal Git files, not LFS, contrary to the docs.
 * Confirmed: 31 screenshot-only tests, 0 assertions, 78 fixed waits.
 * Confirmed: `npm pack` would omit `dist/` (no `files`, `/dist` in
@@ -785,6 +787,14 @@ design.
   run are outward actions, so they are not done here.
 * The GitHub and npm settings are listed in section 6 and in the final report.
 
+### Repository move (2026-10-20)
+
+* `origin` changed to `https://github.com/OpenPowerShift/oscd-editor-supervision.git`.
+* `package.json` `repository`, the README badges and links, and the Antora
+  partial now use the new repository, demo and bundle URLs.
+* The orchestrator playbook points at the new repository.
+* No code, test or behaviour change.
+
 ---
 
 ## 10. Questions for you
@@ -798,8 +808,8 @@ reference plugins and the `OpenPowerShift/...` URL in the brief)? This sets
 `package-name` in `release-please-config.json`, the docs URLs and the npm
 trusted-publisher settings.
 **Decision: `oscd-editor-supervision`, unscoped.** Entry point
-`src/oscd-editor-supervision.ts`, bundle `dist/oscd-editor-supervision.js`. The
-repository stays `danyill/oscd-supervision`.
+`src/oscd-editor-supervision.ts`, bundle `dist/oscd-editor-supervision.js`.
+The repository moved to `OpenPowerShift/oscd-editor-supervision` on 2026-10-20.
 
 **Q2. Deploy target.** The brief asks for `upload-pages-artifact@v3` +
 `deploy-pages@v4` *and* for "GitHub Pages from the `gh-pages` branch". These are
@@ -847,4 +857,4 @@ signing stays on for the later re-sign.
 for this plugin and uses `danyill/oscd-supervision` with `[main, v*]`. After the
 upgrade I will set `start_path: docs` and branch `upgrade` until it is merged.
 **Decision: confirmed.** `start_path: docs`, branch `upgrade` until merged, then
-`[main, v*]`, repository `danyill/oscd-supervision`.
+`[main, v*]`, repository `OpenPowerShift/oscd-editor-supervision`.

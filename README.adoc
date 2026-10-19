@@ -1,13 +1,13 @@
 = OpenSCD Plugin: Supervision
 :plugin-name: oscd-editor-supervision
 :plugin-title: Supervision
-:repo: danyill/oscd-supervision
+:repo: OpenPowerShift/oscd-editor-supervision
 :uri-openwc: https://github.com/open-wc/open-wc
 :uri-docs: https://openpowershift.github.io/sysconex-docs
-:uri-demo: https://danyill.github.io/oscd-supervision/demo/
+:uri-demo: https://openpowershift.github.io/oscd-editor-supervision/demo/
 :uri-npm: https://www.npmjs.com/package/oscd-editor-supervision
 
-image:https://github.com/danyill/oscd-supervision/actions/workflows/test.yml/badge.svg[title='Test status', link=https://github.com/danyill/oscd-supervision/actions/workflows/test.yml]
+image:https://github.com/OpenPowerShift/oscd-editor-supervision/actions/workflows/test.yml/badge.svg[title='Test status', link=https://github.com/OpenPowerShift/oscd-editor-supervision/actions/workflows/test.yml]
 image:https://img.shields.io/badge/built%20with-open--wc-blue.svg[link={uri-openwc},title='Built with open-wc recommendations']
 image:https://img.shields.io/badge/Zulip-%23OpenSCD%20chat-purple?logo=zulip&color=2aa198&labelColor=6c71c4[link=https://openscd.zulipchat.com/]
 
