@@ -406,8 +406,8 @@ name `oscd-editor-supervision`, title *Supervision*.
 |---|---|---|
 | 0 | Plan (`docs/plan.md`), questions | **done** |
 | 1 | Tooling: `@omicronenergy/oscd-tooling`, ESM, `rootDir: ./src`, remove local configs and Husky, `files`, `.gitattributes`, release-please files, remove stale artifacts, drop the old suite and baselines | done |
-| 2 | Foundation: `src/foundation/*`, scl-lib v2, EditV2 actions, unit specs | in progress |
-| 3 | UI: oscd-ui components, scoped elements, `msg()`, theming, sizing, empty states, per-row actions, component specs | pending |
+| 2 | Foundation: `src/foundation/*`, scl-lib v2, EditV2 actions, unit specs | done |
+| 3 | UI: oscd-ui components, scoped elements, `msg()`, theming, sizing, empty states, per-row actions, component specs | in progress |
 | 4 | Demo: `oscd-shell`, `demo/plugins.js`, `demo/sample.scd`, open/save menu plugins | pending |
 | 5 | Tests: driver and plugin helpers, component specs, screenshot tests, coverage thresholds | pending |
 | 6 | CI and release: `test.yml`, `update-visual-baselines.yml`, `release.yml`, delete old workflows, YAML validation | pending |
@@ -572,7 +572,65 @@ worklog.
 | `npm run build` | pass |
 | `npm test` | 79 tests, 3 s, pass, coverage 93.07 % statements |
 
-### Step 3–8
+### Step 3 — User interface
+
+**Replaced**
+
+* `src/oscd-editor-supervision.ts` is now a `ScopedElementsMixin(LitElement)`
+  root which owns `doc`, `docName`, `docVersion`, `controlType` and the
+  selection, builds the model in `willUpdate`, and dispatches one EditV2 per
+  user action with a title. It renders the header (IED selector, name, type,
+  GOOSE/sampled-values switch, usage count), a notice when changes are not
+  allowed, the used supervisions, and the two assignment lists.
+* `src/components/ied-selector.ts` — `OscdFilterButton` with one item per IED.
+* `src/components/supervision-table.ts` — one row per used supervision, with
+  labelled `oscd-icon-button` actions (L1, L2).
+* `src/components/available-supervisions.ts` — search, the selectable rows, the
+  "New LGOS/LSVS supervision" entry and the create button.
+* `src/components/control-block-list.ts` — search and the assignable control
+  blocks; it says "Select a supervision first" until one is chosen.
+* `src/theme.ts` — `oscdMd3Mappings` pointed at the internal `--oscd-*` palette.
+* All text goes through `msg()`; all tags are registered per component; no
+  global `customElements.define` in `src/`.
+* Sizing (U1): `:host` is a 100 %-height column, header fixed, `.content`
+  flexes and scrolls, so the plugin never overflows its host.
+* Theming (U2): `--oscd-theme-*` with Solarized defaults on `:host`, consumed
+  as `--oscd-*` and mapped to `--md-sys-color-*`, so light and dark themes work.
+
+**Deleted**
+
+* `src/foundation/components/` (`oscd-filter-button`, `oscd-filtered-list-old`),
+  `src/foundation/subscription/subscription.ts`, `src/foundation/icons.ts`, and
+  the temporary `compareNames`/`minAvailableLogicalNodeInstance` copies in
+  `foundation.ts`.
+
+**Problems found and fixed**
+
+* **Lit attribute bindings on boolean properties.** `canCreate=${false}` and
+  `?disabled=${true}` do not do what they look like: `canCreate=${false}` sets
+  `cancreate="false"` and the Boolean converter reads any attribute as `true`;
+  `?disabled` on the `oscd-list-item`/`oscd-icon-button` hosts was removed by
+  the components. The plugin now uses `?canCreate=${...}` for the boolean and
+  `.disabled=${...}` for the property.
+* `aria-label` on an `oscd-icon-button` is rendered on the internal button, not
+  on the host, so specs must not query by it. The action buttons carry
+  `data-action="disconnect" | "delete"` and set `.ariaLabel`; the driver and the
+  specs query the data attribute.
+* eslint flagged `@open-wc/testing` and `@openscd/oscd-editor` in
+  `src/testing/**` as dev dependencies; `eslint.config.js` now allows
+  devDependencies for test helpers, as the reference does.
+
+**Verification**
+
+| Command | Result |
+|---|---|
+| `npm run lint` | pass |
+| `npx tsc --noEmit` | pass |
+| `npm run build` | pass |
+| `npm test` | 108 tests, 7.6 s, pass, coverage 94.84 % statements |
+| legacy import search in `src/` | no match |
+
+### Step 4–8
 
 To be written as each step completes, with the commit hashes, the exact
 commands run and their results, and the problems found. Written so that the same
