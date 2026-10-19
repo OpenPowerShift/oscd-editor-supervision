@@ -96,17 +96,14 @@ describe('sort-button', () => {
 
   it('shows the primary colour when the order is not the document order', async () => {
     const element = await mount();
-    expect(
-      element.shadowRoot!.querySelector('#sortButton')!.classList.contains(
-        'off-nominal'
-      )
-    ).to.equal(false);
+    element.style.setProperty('--md-sys-color-primary', '#123456');
+    const button = element.shadowRoot!.querySelector('#sortButton')!;
+    expect(button.classList.contains('off-nominal')).to.equal(false);
     element.order = 'control-name';
     await element.updateComplete;
-    expect(
-      element.shadowRoot!.querySelector('#sortButton')!.classList.contains(
-        'off-nominal'
-      )
-    ).to.equal(true);
+    expect(button.classList.contains('off-nominal')).to.equal(true);
+    expect(getComputedStyle(button.querySelector('oscd-icon')!).color).to.equal(
+      'rgb(18, 52, 86)'
+    );
   });
 });

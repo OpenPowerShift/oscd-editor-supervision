@@ -111,7 +111,18 @@ export class SortButton extends ScopedElementsMixin(LitElement) {
       display: inline-flex;
     }
 
+    /*
+     * The standard icon button paints its icon from its own token, so the
+     * colour is set there as well as on the icon itself.
+     */
     .off-nominal {
+      --md-icon-button-icon-color: var(--md-sys-color-primary);
+      --md-icon-button-hover-icon-color: var(--md-sys-color-primary);
+      --md-icon-button-focus-icon-color: var(--md-sys-color-primary);
+      --md-icon-button-pressed-icon-color: var(--md-sys-color-primary);
+    }
+
+    .off-nominal oscd-icon {
       color: var(--md-sys-color-primary);
     }
 

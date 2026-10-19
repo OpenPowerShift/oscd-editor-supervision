@@ -90,11 +90,12 @@ export class IedSelector extends ScopedElementsMixin(LitElement) {
     return html`<oscd-outlined-button
       id="iedButton"
       title=${msg('Select IED')}
+      .trailingIcon=${true}
       @click=${() => this.open()}
     >
-      <oscd-icon slot="icon">developer_board</oscd-icon>
+      <oscd-icon slot="icon">expand_more</oscd-icon>
+      <oscd-icon class="board">developer_board</oscd-icon>
       <span class="ied-name">${name}</span>
-      <oscd-icon class="chevron">expand_more</oscd-icon>
     </oscd-outlined-button>
     <oscd-dialog>
       <div slot="headline">${msg('Select IED')}</div>
@@ -119,10 +120,11 @@ export class IedSelector extends ScopedElementsMixin(LitElement) {
       display: inline-flex;
     }
 
-    .chevron {
-      --md-icon-size: 20px;
-      margin-inline-start: 4px;
-      margin-inline-end: -8px;
+    /* The chevron uses the button's trailing icon slot, so the button gives it
+       the right space; the board icon sits before the name in the label. */
+    .board {
+      --md-icon-size: 18px;
+      margin-inline-end: 8px;
       vertical-align: middle;
     }
 

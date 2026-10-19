@@ -809,9 +809,18 @@ surface until hover, so the IED read as a decoration and not as a control.
   the IED name, type, description and manufacturer.
 * The header no longer repeats the IED name in a visible `h1`; a visually hidden
   `h1` keeps the page heading.
+* The chevron uses the button's trailing icon slot. Inside the label it was
+  clipped by the label's `overflow: hidden`.
 * Screenshot tests blur the active element before the capture, so a focus ring
   from the setup interaction is not part of the baseline.
 * The screen page and the icon page describe the new button.
+
+### Sort highlight (2026-10-20)
+
+The sort button changed colour as a host, but the standard icon button paints
+its icon from its own `--md-icon-button-icon-color` token, so the icon stayed
+grey. The token and the icon colour are now set when the order is not the
+document order. `sort-button.spec.ts` asserts the computed icon colour.
 
 ### Row layout, sorting and issues #8 and #11 (2026-10-20)
 
