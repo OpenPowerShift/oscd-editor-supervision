@@ -1,0 +1,10 @@
+:plugin-name: oscd-editor-supervision
+:plugin-title: Supervision
+:url-repo: https://github.com/OpenPowerShift/oscd-editor-supervision
+:url-issues: https://github.com/OpenPowerShift/oscd-editor-supervision/issues
+:url-chat: https://openscd.zulipchat.com/
+:url-demo: https://openpowershift.github.io/oscd-editor-supervision/demo/
+:url-bundle: https://openpowershift.github.io/oscd-editor-supervision/oscd-editor-supervision.js
+:url-npm: https://www.npmjs.com/package/oscd-editor-supervision
+:sectnums:
+:experimental:

@@ -1,0 +1,84 @@
+= Supervisions
+include::partial$base.adoc[]
+
+The *LGOS supervisions* section, or the *LSVS supervisions* section, shows the
+supervisions that supervise a control block the IED subscribes to.
+
+The main text of a row shows the supervision and the supervised control block,
+for example `GOOSE_Supervision/LGOS1 --> GOOSE_Publisher > GOOSE2`.
+The control block is in a tinted box, so that it is easy to tell the two apart.
+
+The second line shows the description of the supervision, then the description
+of the control block, for example `Important1 > Important2 --> Trip`.
+
+The supervision description is the `desc` of the logical node and the `desc` of
+its `St` data, or the `d` value inside it, joined with a `>`.
+The control block description is the `desc` of the control block.
+The descriptions of the parents are not shown: they usually repeat the name and
+the path, and add no information.
+A missing description is left out.
+
+A control block row in the control block list shows the IED and the control
+block in the main text, and the path, the descriptions, the data set and the id
+below.
+
+.A used supervision
+image::supervision-selected.png[The plugin with one available supervision selected.]
+
+== The status of a supervision
+
+The plugin compares the reference of each supervision with the subscriptions of
+the IED.
+The comparison gives one of four statuses.
+
+[cols="1,3"]
+|===
+|Status |Meaning
+
+|Used
+|The supervision holds the reference of a control block the IED subscribes to.
+The row is in the supervision section.
+
+|Available
+|The supervision holds no reference.
+
+|Not subscribed
+|The supervision holds the reference of a control block in the file, but the IED
+does not subscribe to it.
+
+|Missing control block
+|The supervision holds a reference that no control block in the file matches.
+Check that the publishing IED is in the file.
+|===
+
+.A reference which no control block matches
+image::missing-control-block.png[The plugin with a supervision whose control block is not in the file.]
+
+== Disconnect a supervision
+
+Disconnect keeps the supervision logical node in the file and removes its
+reference.
+
+. Find the supervision in the supervision section.
+. Click the btn:[Disconnect] button on its row.
+
+The supervision moves to the available section.
+
+== Delete a supervision
+
+Delete removes the supervision logical node from the file.
+
+. Find the supervision in the supervision section.
+. Click the btn:[Delete] button on its row.
+
+CAUTION: An IED uses the first supervision logical node of a kind as the example
+for a new one.
+The plugin does not let you delete it.
+The button is off, and the tooltip tells you why.
+
+== All supervisions are assigned
+
+When each subscription has a supervision, the control block list is empty.
+
+.Each subscription is supervised
+image::all-assigned.png[The plugin with the message No control block is available to supervise.]

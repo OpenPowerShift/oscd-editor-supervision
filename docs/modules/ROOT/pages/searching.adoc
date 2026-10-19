@@ -1,0 +1,42 @@
+= Search
+include::partial$base.adoc[]
+
+The available supervisions and the control block list have a search field.
+
+Type in the field.
+The list shows only the items that match all the terms.
+
+.A search without a match
+image::search-no-match.png[The plugin with a search term and the message Nothing matches the search.]
+
+== Search rules
+
+* The search is not case sensitive.
+  `lgos` finds `LGOS` and `Lgos`.
+* A space separates two terms.
+  An item must match all the terms.
+  For example, `Publisher GOOSE2` finds a control block of `GOOSE_Publisher`
+  named `GOOSE2`.
+* Quotes (`"` or `'`) keep a phrase together, with its spaces.
+  For example, `"GOOSE2sDataSet"` finds the data set with that name.
+* `*` matches any text.
+  For example, `GOOSE*` finds `GOOSE1` and `GOOSE2`.
+* `?` matches one character.
+  For example, `LGOS ?` finds `LGOS 1` and `LGOS 2`.
+
+== What the search looks at
+
+For a supervision, the search looks at:
+
+* The logical device and the logical node, for example
+  `GOOSE_Supervision/LGOS1`.
+* The description of the logical node and of its `St` data.
+* The reference of the control block.
+
+For a control block, the search looks at:
+
+* The IED and the control block name.
+* The logical device and the logical node.
+* The description.
+* The data set name.
+* The `appID` of a GOOSE control, or the `smvID` of a sampled value control.

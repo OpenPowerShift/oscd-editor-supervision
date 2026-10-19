@@ -4,18 +4,15 @@
 
 ## testing
 /coverage/
+/test/screenshots/failed/
 
 # build
 /locales.ts
 /locales
 /dist
-/custom-elements.json
 /.tsbuildinfo
 /.rollup.cache
 
 # IDE
 /.idea
 *.iml
-
-# failed screenshots
-test/screenshots/failed/

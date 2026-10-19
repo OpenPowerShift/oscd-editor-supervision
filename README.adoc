@@ -1,29 +1,54 @@
 = OpenSCD Plugin: Supervision
-:plugin-name: oscd-supervision
-:sectnums:
-:sectlinks:
-:toc: macro
-:imagesdir: docs/media
-:icons: font
-:experimental:
+:plugin-name: oscd-editor-supervision
+:plugin-title: Supervision
+:repo: OpenPowerShift/oscd-editor-supervision
 :uri-openwc: https://github.com/open-wc/open-wc
-:uri-docs: https://danyill.github.io/tpnz-openscd-docs
-:uri-openscd-core-plugin-demo: https://danyill.github.io/{plugin-name}/index.deploy.html
-// badges
-image:https://github.com/danyill/oscd-supervision/actions/workflows/test.yml/badge.svg[title='Build Status']
-image:https://img.shields.io/badge/built%20with-open--wc-blue.svg[link={uri-openwc},title='Built with open-wc recommendations']
-image:https://img.shields.io/badge/Zulip%20-%20%23OpenSCD%20chat-purple?logo=zulip&color=2aa198&labelColor=6c71c4[link=https://openscd.zulipchat.com/]
+:uri-docs: https://openpowershift.github.io/sysconex-docs
+:uri-demo: https://openpowershift.github.io/oscd-editor-supervision/demo/
+:uri-npm: https://www.npmjs.com/package/oscd-editor-supervision
 
-toc::[]
+image:https://github.com/OpenPowerShift/oscd-editor-supervision/actions/workflows/test.yml/badge.svg[title='Test status', link=https://github.com/OpenPowerShift/oscd-editor-supervision/actions/workflows/test.yml]
+image:https://img.shields.io/badge/built%20with-open--wc-blue.svg[link={uri-openwc},title='Built with open-wc recommendations']
+image:https://img.shields.io/badge/Zulip-%23OpenSCD%20chat-purple?logo=zulip&color=2aa198&labelColor=6c71c4[link=https://openscd.zulipchat.com/]
 
 == What is this?
 
-This plugin is intended to allow a user to add, remove and configure IEC 61850 GOOSE and SMV supervisions:
+The {plugin-title} plugin assigns and removes IEC 61850 GOOSE and sampled value
+supervisions in an SCL file.
 
-This is a plugin for OpenSCD core, the core editor engine for OpenSCD.
+The plugin creates, assigns, disconnects and deletes supervision logical nodes
+of the classes `LGOS` and `LSVS`.
 
-Feel free to log issues to request fixes, improvements or new features.
+The plugin uses the OpenSCD plugin API.
+Add it to the `editor` plugins of a distribution.
+Refer to the {uri-docs}[documentation].
 
-See the {uri-docs}[documentation] for more information or {uri-openscd-core-plugin-demo}[try it out standalone].
+== Try it
 
-© 2024 OpenSCD Daniel Mulholland
+Open the {uri-demo}[online demo].
+The demo opens a sample SCL file.
+
+Install the package from {uri-npm}[npm]:
+
+ $ npm i oscd-editor-supervision
+
+== Development
+
+ $ npm i
+ $ npm start
+
+Open http://localhost:8000/demo/ in a browser.
+
+Run the checks:
+
+ $ npm run lint
+ $ npm test
+
+Refer to the development page in the {uri-docs}[documentation] for the build,
+the tests, the screenshot baselines and the release.
+
+== License
+
+Copyright 2024 Daniel Mulholland.
+
+This plugin uses the Apache License, version 2.0.

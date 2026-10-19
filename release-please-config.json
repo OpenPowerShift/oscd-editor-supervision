@@ -1,0 +1,10 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "bootstrap-sha": "7526cd1b46d90d6040b5bac93a8f8b5d29cb4266",
+  "packages": {
+    ".": {
+      "release-type": "node",
+      "package-name": "oscd-editor-supervision"
+    }
+  }
+}

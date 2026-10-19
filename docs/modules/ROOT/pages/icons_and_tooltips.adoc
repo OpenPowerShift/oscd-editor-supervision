@@ -1,0 +1,55 @@
+= Icons and tooltips
+include::partial$base.adoc[]
+
+== Icons
+
+[cols="1,3"]
+|===
+|Icon |Meaning
+
+|IED (`developer_board`)
+|The outlined button shows the selected IED.
+The chevron shows that it opens the IED selection dialog.
+
+|Heart monitor (`monitor_heart`)
+|A supervision logical node.
+
+|Broken chain (`link_off`)
+|Disconnect the supervision.
+
+|Bin (`delete`)
+|Delete the supervision.
+
+|Plus (`add`)
+|Create an empty supervision logical node.
+
+|Yellow triangle (`warning`)
+|The plugin cannot change the supervisions of this IED.
+Refer to xref:allowing_supervision_modifications.adoc[].
+
+|GOOSE (`gooseIcon`)
+|A GOOSE control block.
+
+|Sampled values (`smvIcon`)
+|A sampled value control block.
+
+|Search (`search`)
+|The search field.
+
+|Sort (`sort`)
+|The sort dialog.
+The icon is in the primary colour when the order is not the document order.
+
+|Heart with plus (`heart_plus`)
+|The New supervision entry.
+|===
+
+== Tooltips
+
+Hold the pointer on an item to see its tooltip.
+
+* A supervision row shows its description and the control block it supervises.
+* A control block row shows its path, its data set and its id.
+* A button shows what it does, for example *Delete this supervision*.
+* A button which is off shows why, for example *No free supervision is
+  allowed*.

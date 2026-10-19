@@ -1,0 +1,42 @@
+= Sort the supervisions
+include::partial$base.adoc[]
+
+The btn:[Sort] button is in the header.
+It changes the order of the supervision section and of the control block
+list.
+
+Click the button, choose one order, then click btn:[Apply].
+
+.The sort dialog
+image::sort-menu.png[The Sort dialog with four orders: Document order, Supervision description, Control block name and Control block description.]
+
+== The orders
+
+[cols="1,3"]
+|===
+|Order |The rows are sorted by
+
+|Document order
+|The place of the supervision and the control block in the SCL file.
+This is the default order.
+
+|Supervision description
+|The description of the supervision.
+Rows without a description are last.
+
+|Control block name
+|The name of the supervised control block, then the IED name.
+
+|Control block description
+|The description of the supervised control block.
+Rows without a description are last.
+|===
+
+== The button shows a non-default order
+
+When the order is not the document order, the sort icon is in the primary
+colour.
+Thus you can see that the rows are not in the document order.
+
+.A non-default order, by the control block name
+image::sort-active.png[The plugin with the available supervisions sorted by their description and the sort icon in the primary colour.]
