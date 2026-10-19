@@ -1,0 +1,163 @@
+= Development
+include::partial$base.adoc[]
+:uri-nvm: https://github.com/creationix/nvm
+:uri-nvm-install: {uri-nvm}#installation
+:uri-openwc: https://github.com/open-wc/open-wc
+:uri-antora: https://antora.org
+:uri-wtr: https://modern-web.dev/docs/test-runner/overview/
+:uri-playwright: https://playwright.dev
+
+== License
+
+This plugin is a web component and follows the {uri-openwc}[open-wc]
+recommendations.
+
+This plugin uses the Apache License.
+You can use it, study it, share it and improve it.
+
+== Prerequisites
+
+The plugin uses Node.js and npm, and it is verified on Linux.
+
+Check the Node.js version:
+
+ $ node -v
+
+A good way to install Node.js is {uri-nvm}[nvm]:
+
+ $ nvm install --lts
+
+== Clone and run the demo
+
+[subs=+attributes]
+$ git clone {url-repo}
+$ cd {plugin-name}
+$ npm i
+$ npm start
+
+Open http://localhost:8000/demo/ in a browser.
+
+== Build and bundle
+
+Build the TypeScript sources into `dist`:
+
+ $ npm run build
+
+Build one bundle for a distribution, and the demo:
+
+ $ npm run bundle
+
+== Lint and format
+
+Scan the project:
+
+ $ npm run lint
+
+Fix the problems which the linter can fix:
+
+ $ npm run format
+
+== Tooling
+
+Build, lint, test, bundling and the git hooks come from the shared `oscd`
+command in `@omicronenergy/oscd-tooling`.
+The npm scripts in `package.json` call it.
+Formatting uses the shared ESLint configuration, not Prettier.
+
+`oscd clean` does not remove anything on Linux.
+`npm run build`, `npm test` and `npm run bundle` run `npm run clean` first.
+
+== Tests
+
+Tests use {uri-wtr}[Web Test Runner] and {uri-playwright}[Playwright] with
+Chromium.
+
+`*.spec.ts`:: Unit and component tests.
+  `npm test` runs them and enforces the coverage thresholds in
+  `web-test-runner.config.js`.
+`*.test.ts`:: Screenshot tests.
+  `npm run test:visual` runs them.
+
+Run the unit tests with coverage:
+
+ $ npm test
+
+The report is in `coverage/lcov-report/index.html`.
+
+Run one spec after a build:
+
+ $ SPEC=dist/foundation/search.spec.js npm test
+
+Run the unit tests in watch mode:
+
+ $ npm run test:watch
+
+=== Where the tests are
+
+`src/foundation/**/*.spec.ts`:: Unit tests for the functions which work on SCL,
+search, sorting and the model.
+`src/**/*.spec.ts`:: Component tests.
+  They mount the component, interact with it as a user does, and check the SCL
+  document and the edits the plugin dispatches.
+`src/testing/`:: Helpers.
+  `plugin.ts` mounts the plugin and applies its edits as a host does.
+  `driver.ts` is the only file which knows the DOM structure.
+`test/fixtures/`:: SCL files for the tests.
+
+Specs do not use fixed waits or pixel coordinates.
+They wait for an event or for a condition.
+
+=== Screenshot tests
+
+`src/oscd-editor-supervision.test.ts` takes a screenshot of each important
+state and compares it with a baseline in `test/screenshots/baseline`.
+
+ $ npm run test:visual
+
+Rendering differs between machines.
+CI owns the baselines.
+Do not create, change or commit a baseline on your machine.
+
+When you add a screenshot test or change the screen on purpose, add the
+`update-visual-baselines` label to your pull request.
+The `Update visual baselines` workflow then runs `oscd test --update` and
+commits the images to your branch.
+Review the images.
+
+A screenshot without a baseline fails the run.
+
+== Documentation
+
+The user documentation is an {uri-antora}[Antora] component in `docs/`.
+The pages are in `docs/modules/ROOT/pages`, and `docs/antora.yml` describes the
+component.
+The Markdown files in `docs/` are notes for developers.
+Antora does not use them.
+
+Each image in `docs/modules/ROOT/images` is a relative symbolic link to a
+baseline in `test/screenshots/baseline`.
+When CI changes a baseline, the documentation shows the new image.
+
+To add an image:
+
+. Add a screenshot test for the state.
+. Add the `update-visual-baselines` label to the pull request, so CI makes the
+  baseline.
+. Link the baseline into the documentation:
+
+ $ cd docs/modules/ROOT/images
+ $ ln -s "../../../../test/screenshots/baseline/<test name>-Chromium.png" <short-name>.png
+
+The baselines are normal Git files, not Git LFS files.
+Antora reads the repository with Git, and it cannot get Git LFS files.
+
+The `sysconex-docs` playbook builds the documentation site from the components
+of several plugins.
+
+== Release
+
+A push to `main` runs the tests.
+When they pass, release-please opens or updates a release pull request.
+Merging that pull request tags the release and publishes the package to npm
+with Trusted Publishing.
+The `dist` folder is deployed to GitHub Pages from the same workflow.

@@ -1,0 +1,57 @@
+= Assign a supervision
+include::partial$base.adoc[]
+
+An assignment connects one supervision logical node to one control block.
+
+== Assign a control block to an available supervision
+
+. Select the IED. Refer to xref:screen_layout.adoc[].
+. In *Available supervisions*, click the supervision.
+. In the control block list, click the control block.
+
+The plugin writes the reference of the control block into the supervision
+logical node.
+The supervision moves to the supervision section.
+
+.A supervision is selected
+image::supervision-selected.png[The plugin with one available supervision selected and the control blocks ready to choose.]
+
+== Create a supervision and assign it
+
+. Select the IED.
+. In *Available supervisions*, click *New LGOS supervision*, or *New LSVS
+  supervision*.
+. In the control block list, click the control block.
+
+The plugin creates the supervision logical node and writes the reference in one
+step.
+
+== Create an empty supervision
+
+. Select the IED.
+. In *Available supervisions*, click the btn:[Create] button.
+
+The plugin adds an empty supervision logical node.
+The new supervision is in the available section.
+
+NOTE: The IED must allow one more supervision.
+The count "N more allowed" shows the remaining number.
+Refer to xref:allowing_supervision_modifications.adoc[].
+
+.At the maximum number of supervisions
+image::at-the-maximum.png[The plugin at the maximum number of supervisions, with the create button off.]
+
+== Change the control block of a supervision
+
+. Select the IED.
+. In the supervision section, click btn:[Disconnect] on the supervision.
+. In *Available supervisions*, click the supervision.
+. In the control block list, click the new control block.
+
+== The plugin cannot change the file
+
+When the file does not allow changes, the plugin shows a message and the
+buttons are off.
+
+.The plugin cannot change this IED
+image::not-editable.png[The plugin with the message that the set source reference is not editable.]

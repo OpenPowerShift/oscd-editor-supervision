@@ -1,0 +1,14 @@
+= Support
+include::partial$base.adoc[]
+
+The plugin authors are often available on {url-chat}[Zulip].
+
+Log an {url-issues}[issue] to ask for a fix, an improvement or help.
+
+Include these items in an issue:
+
+* The version of the plugin.
+* The steps to repeat the problem.
+* What you expected.
+* What happened.
+* The SCL file, or the smallest part of it that shows the problem.

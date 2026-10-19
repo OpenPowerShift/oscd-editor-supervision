@@ -1,0 +1,40 @@
+= Get the plugin
+include::partial$base.adoc[]
+
+== Try the plugin online
+
+Open the {url-demo}[online demo].
+The demo opens a sample SCL file.
+
+The demo shows the latest version of the `main` branch.
+
+== Add the plugin to an OpenSCD distribution
+
+The plugin is an editor plugin.
+It uses the OpenSCD plugin API, which `oscd-shell` and the newer OpenSCD
+distributions use.
+
+Add this entry to the `editor` plugins of the distribution:
+
+[source,json,subs=+attributes]
+----
+{
+  "name": "{plugin-title}",
+  "translations": {
+    "de": "Überwachung",
+    "pt": "Supervisão"
+  },
+  "icon": "ecg",
+  "requireDoc": true,
+  "src": "{url-bundle}"
+}
+----
+
+The `src` URL is the bundle that CI builds from the `main` branch.
+To use a release, install the {url-npm}[npm package] and set `src` to its
+bundle.
+
+== Add the plugin to the demo
+
+The plugin is the only editor plugin.
+The demo loads it from `./plugins.js`.

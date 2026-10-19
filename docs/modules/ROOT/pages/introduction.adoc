@@ -1,0 +1,46 @@
+= Introduction
+include::partial$base.adoc[]
+
+The {plugin-title} plugin assigns and removes IEC 61850 GOOSE and sampled value
+supervisions in an SCL file.
+
+A supervision is a logical node of the class `LGOS` for GOOSE, or `LSVS` for
+sampled values.
+It holds the reference of one control block.
+An IED uses the supervision to monitor a subscription.
+
+== What the plugin does
+
+* It assigns a control block to a supervision logical node.
+* It removes the assignment of a supervision logical node.
+* It deletes a supervision logical node.
+* It creates a supervision logical node.
+* It shows each supervision and the control block it supervises.
+
+== How the plugin works
+
+The plugin shows the supervisions of one IED.
+
+A supervision which supervises a control block the IED subscribes to is
+*used*.
+The used section shows it with its control block.
+
+A supervision which supervises nothing, or which holds the reference of a
+control block the IED does not subscribe to, is *available*.
+The available section shows it.
+You can assign a control block to an available supervision.
+
+.Overview
+image::overview.png[The plugin. The used supervisions are at the top, the available supervisions and the control blocks are below.]
+
+== Limits
+
+* The plugin supervises only control blocks of other IEDs.
+  An IED supervises the messages it receives.
+* The plugin offers only control blocks the selected IED already subscribes
+  to.
+  Add the subscription first, in the tool that creates it.
+* The plugin changes a supervision only when the SCL file allows it.
+  Refer to xref:allowing_supervision_modifications.adoc[].
+* The plugin does not change the `Services` element.
+  The `Services` element declares how many supervisions an IED supports.

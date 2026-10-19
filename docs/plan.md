@@ -410,8 +410,8 @@ name `oscd-editor-supervision`, title *Supervision*.
 | 3 | UI: oscd-ui components, scoped elements, `msg()`, theming, sizing, empty states, per-row actions, component specs | done |
 | 4 | Demo: `oscd-shell`, `demo/plugins.js`, `demo/sample.scd`, open/save menu plugins | done |
 | 5 | Tests: driver and plugin helpers, component specs, screenshot tests, coverage thresholds | done |
-| 6 | CI and release: `test.yml`, `update-visual-baselines.yml`, `release.yml`, delete old workflows, YAML validation | in progress |
-| 7 | Docs: move to `docs/`, rewrite pages, symlinks, orchestrator playbook, Antora verification | pending |
+| 6 | CI and release: `test.yml`, `update-visual-baselines.yml`, `release.yml`, delete old workflows, YAML validation | done |
+| 7 | Docs: move to `docs/`, rewrite pages, symlinks, orchestrator playbook, Antora verification | in progress |
 | 8 | Final checks: lint, tsc, build, test, bundle, pack, legacy grep, empty-file check, demo in Playwright, report | pending |
 
 Every step: `npm run lint`, `npx tsc --noEmit`, `npm run build`, `npm test`; one
@@ -720,11 +720,51 @@ worklog.
 | YAML parse of the three workflows (`python3 -c "import yaml"`) | all three parse |
 | `npm pack --dry-run` | 51 files; no `*.spec.*`, `*.test.*`, `dist/testing` or `dist/demo`; `dist/oscd-editor-supervision.js` included |
 
-### Step 7–8
+### Step 7 — Documentation
 
-To be written as each step completes, with the commit hashes, the exact
-commands run and their results, and the problems found. Written so that the same
-work can be repeated on a similar plugin.
+**Changed**
+
+* `antora.yml` and `modules/` moved into `docs/` with `git mv`. Component name
+  `oscd-editor-supervision`, title *Supervision*.
+* Pages: `introduction`, `installation` (*Get the plugin*), `screen_layout`
+  (*The screen*), `supervisions`, `assigning`, `searching`,
+  `icons_and_tooltips`, `allowing_supervision_modifications`, `support`,
+  `development`; `usage.adoc` is replaced by the three task pages.
+* `partials/base.adoc` now names **this** plugin, with its repository, issues,
+  demo, bundle and npm URLs (the old partial named the later-binding plugin, so
+  every title and URL was wrong).
+* `README.adoc` rewritten for the new name, the tooling and the demo.
+* 11 documentation images are relative symbolic links to the screenshot
+  baselines. The 2024 PNGs and their `image:` references are gone.
+* All pages are written in ASD-STE100 Simplified Technical English: short
+  sentences, imperative steps, the exact UI labels in `btn:[...]`, one term per
+  meaning (`LGOS`/`LSVS` supervision, control block, reference).
+* The orchestrator playbook
+  `sysconex-docs/antora-playbook.yml` now has `start_path: docs` and branch
+  `upgrade` for this plugin (left uncommitted in that repository).
+
+**Verification**
+
+* Antora 3.2.1 installed in a scratch folder (not in the plugin).
+* From the worktree: the build logs `ENOENT: broken symbolic link` for the 11
+  images and `target of image not found` for the pages, because CI has not made
+  the baselines yet; all 10 pages are still generated.
+* From Git (`worktrees: false`, branch name) against a copy of the repository
+  with placeholder baselines: exit 0, no error or warning, 11 pages,
+  11 images copied.
+* From the worktree against the same copy: exit 0, no error or warning.
+* Every `<img src>` and every cross-page `<a href>` in the generated HTML
+  resolves; no missing target.
+
+**Remaining**
+
+The symlinks stay broken until the `update-visual-baselines` run commits the
+baselines. The `test.yml` documentation image check fails until then, by
+design.
+
+### Step 8
+
+To be written when the final checks are complete.
 
 ---
 

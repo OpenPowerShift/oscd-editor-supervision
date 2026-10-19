@@ -1,0 +1,61 @@
+= The screen
+include::partial$base.adoc[]
+
+.The parts of the screen
+image::overview.png[The plugin. The header is at the top, and three lists are below.]
+
+== The header
+
+The header shows the selected IED and the controls for the screen.
+
+IED selector:: The button at the left opens a dialog.
+Select one IED in the dialog.
+Click btn:[Apply].
+.Click an IED
+image::ied-dialog.png[The IED selection dialog with one IED selected.]
+
+The IED name and its type are next to the button.
+A description of the IED is shown when the file has one.
+
+Control type:: The switch selects GOOSE or sampled values.
+* *GOOSE* shows the `LGOS` supervisions and the GOOSE control blocks.
+* *Sampled values* shows the `LSVS` supervisions and the sampled value control
+  blocks.
+
+Usage:: The text at the right shows how many supervisions are used, for example
+`2 of 3 supervisions used`.
+
+== The sections
+
+The screen has three sections.
+
+LGOS supervisions, or LSVS supervisions:: The supervisions that supervise a
+control block the IED subscribes to.
+Each row has two buttons.
+
+Available supervisions:: The supervisions that supervise nothing, or that hold
+the reference of a control block the IED does not subscribe to.
+
+GOOSE control blocks, or Sampled value control blocks:: The control blocks the
+IED subscribes to and no supervision holds.
+Choose a row to assign the control block.
+
+== A narrow screen
+
+When the window is narrow, the available supervisions and the control blocks are
+one below the other.
+
+== The plugin keeps nothing
+
+The plugin does not keep the selection, the control type or the search text.
+The next session starts with the first IED and GOOSE.
+
+== Empty states
+
+The plugin shows a message when there is nothing to show.
+
+.No IED in the file
+image::without-ieds.png[The plugin with the message No IEDs in this file.]
+
+.No supervision of the selected IED
+image::without-supervisions.png[The plugin with an empty supervision section.]

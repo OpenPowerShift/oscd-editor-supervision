@@ -1,0 +1,119 @@
+= Allow supervision changes in the SCL file
+include::partial$base.adoc[]
+
+The plugin changes a supervision only when the SCL file allows it.
+
+The plugin needs two items in the file:
+
+* An `LGOS` logical node for GOOSE, or an `LSVS` logical node for sampled
+  values.
+  The first one of a kind is the example for a new one.
+* The `setSrcRef` data attribute of the first logical node, or of its type, must
+  be editable.
+
+Make sure that a change is correct for the IED and for your engineering tool.
+
+== Item 1: the setSrcRef data attribute
+
+Set these items on the `GoCBRef` data object for `LGOS`, or on the `SvCBRef`
+data object for `LSVS`:
+
+* `valImport="true"`
+* `valKind="RO"` or `valKind="Conf"`
+
+You can set the items in two places.
+
+=== On the logical node
+
+.An example in a logical node
+[source,xml,subs=+quotes]
+----
+<LN lnType="someTypeReference" lnClass="LGOS" inst="1" prefix="">
+  ...
+  <DOI name="GoCBRef">
+    ...
+    <DAI name="setSrcRef" valKind="RO" valImport="true"> <!--1-->
+      <Val>XAT_288_MU1MUGO/LLN0.AdjBusCouplerInd</Val> <!--2-->
+    </DAI>
+  </DOI>
+</LN>
+----
+<1> The value of `valKind` and `valImport`.
+<2> A reference which the plugin changes.
+
+=== On the type
+
+A logical node refers to an `LNodeType`.
+The `LNodeType` refers to a `DOType`, which holds the data attribute.
+
+.An `LGOS` logical node which refers to a type
+[source,xml]
+----
+<LN lnType="someTypeReference" lnClass="LGOS" inst="1" prefix="">
+  ...
+  <DOI name="GoCBRef">
+    <DAI name="setSrcRef">
+      <Val>XAT_288_MU1MUGO/LLN0.AdjBusCouplerInd</Val>
+    </DAI>
+  </DOI>
+  ...
+</LN>
+----
+
+.An `LNodeType` for an `LGOS` logical node
+[source,xml]
+----
+<LNodeType id="someTypeReference" lnClass="LGOS">
+  ...
+  <DO name="GoCBRef" type="SomeDOType"/> <!--1-->
+  ...
+</LNodeType>
+----
+<1> The reference to the data object type.
+
+.A `DOType` with the data attribute
+[source,xml]
+----
+<DOType id="SomeDOType" cdc="ORG">
+  ...
+  <DA name="setSrcRef" fc="SP" dchg="true" bType="ObjRef"
+      valKind="RO" valImport="true"/> <!--1-->
+  ...
+</DOType>
+----
+<1> The value of `valKind` and `valImport`.
+
+TIP: A `DOType` can be used by more than one logical node.
+Make a separate `DOType` for the supervision nodes when other nodes must not
+change.
+
+== Item 2: the number of supervisions
+
+The `Services` element declares how many supervision logical nodes the IED
+supports.
+
+[source,xml]
+----
+<Services nameLength="64">
+  <SupSubscription
+    maxGo="128" <!--1-->
+    maxSv="60"/> <!--2-->
+</Services>
+----
+<1> 128 `LGOS` supervisions are allowed.
+<2> 60 `LSVS` supervisions are allowed.
+
+The plugin shows "N more allowed".
+The create button is off when there is no free supervision.
+
+== The plugin is off
+
+When an item is missing, the plugin shows a message and the buttons are off.
+
+* "This IED has no supervision logical node of this kind", when the file has no
+  `LGOS` or `LSVS` node.
+  The plugin needs one as the example for a new one.
+* "The setSrcRef of the first supervision logical node is not editable", when
+  item 1 is missing.
+
+Fix the file, then reload it.
