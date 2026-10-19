@@ -46,13 +46,20 @@ export class SupervisionTable extends ScopedElementsMixin(LitElement) {
   }
 
   private renderRow(row: SupervisionInfo): TemplateResult {
-    const controlName =
-      row.controlBlock?.name ?? msg('No control block in this file');
+    const controlName = row.controlBlock
+      ? `${row.controlBlock.name}${
+        row.controlBlock.ownDescription
+          ? ` - ${row.controlBlock.ownDescription}`
+          : ''
+      }`
+      : msg('No control block in this file');
     return html`<oscd-list-item class="row">
       <oscd-icon slot="start">monitor_heart</oscd-icon>
-      <div slot="headline">${row.path}</div>
+      <div slot="headline">${controlName}</div>
       <div slot="supporting-text">
-        ${row.description ? html`${row.description} - ` : nothing}${controlName}
+        <span class="supervision">${row.path}</span>${row.description
+          ? html` - ${row.description}`
+          : nothing}
       </div>
       <div slot="end" class="actions">
         <oscd-icon-button
@@ -91,6 +98,16 @@ export class SupervisionTable extends ScopedElementsMixin(LitElement) {
   static styles = css`
     :host {
       display: block;
+    }
+
+    [slot='headline'] {
+      font-weight: 500;
+    }
+
+    /* The supervision is the container; the control block is the message it
+       watches. This keeps the supervision readable on the second line. */
+    .supervision {
+      font-weight: 500;
     }
 
     .actions {

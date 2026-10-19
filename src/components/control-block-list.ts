@@ -1,4 +1,4 @@
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, LitElement } from 'lit';
 import type { TemplateResult } from 'lit';
 import { msg } from '@lit/localize';
 import { property, state } from 'lit/decorators.js';
@@ -49,9 +49,12 @@ export class ControlBlockList extends ScopedElementsMixin(LitElement) {
   }
 
   private renderRow(row: ControlBlockInfo): TemplateResult {
-    const supporting = [row.path, row.dataset, row.id]
+    const supporting = [row.path, row.description, row.dataset, row.id]
       .filter(part => !!part)
       .join(' - ');
+    const headline = `${row.name}${
+      row.ownDescription ? ` - ${row.ownDescription}` : ''
+    }`;
     return html`<oscd-list-item
       type="button"
       class="row"
@@ -59,7 +62,7 @@ export class ControlBlockList extends ScopedElementsMixin(LitElement) {
       @click=${() => this.select(row.element)}
     >
       <oscd-icon slot="start">${this.iconName}</oscd-icon>
-      <div slot="headline">${row.name}</div>
+      <div slot="headline">${headline}</div>
       <div slot="supporting-text">${supporting}</div>
     </oscd-list-item>`;
   }
@@ -79,19 +82,16 @@ export class ControlBlockList extends ScopedElementsMixin(LitElement) {
       </oscd-outlined-text-field>
     </div>
     ${!this.assignable
-      ? html`<p class="empty">
-          ${msg('Select a supervision first.')}
-        </p>`
-      : nothing}
-    <oscd-list>
-      ${shown.length === 0
-        ? html`<p class="empty">
-            ${this.search
-              ? msg('Nothing matches the search.')
-              : msg('No control block is available to supervise.')}
-          </p>`
-        : shown.map(row => this.renderRow(row))}
-    </oscd-list>`;
+      ? html`<p class="empty">${msg('Select a supervision first.')}</p>`
+      : html`<oscd-list>
+          ${shown.length === 0
+            ? html`<p class="empty">
+                ${this.search
+                  ? msg('Nothing matches the search.')
+                  : msg('No control block is available to supervise.')}
+              </p>`
+            : shown.map(row => this.renderRow(row))}
+        </oscd-list>`}`;
   }
 
   static styles = css`
@@ -99,6 +99,10 @@ export class ControlBlockList extends ScopedElementsMixin(LitElement) {
       display: flex;
       flex-direction: column;
       min-height: 0;
+    }
+
+    [slot='headline'] {
+      font-weight: 500;
     }
 
     .filter {

@@ -30,6 +30,10 @@ describe('oscd-editor-supervision', () => {
     await mount();
     await driver.selectIed('GOOSE_Subscriber1');
     expect(driver.headlines('used')).to.deep.equal([
+      'GOOSE_Publisher > GOOSE2',
+      'GOOSE_Publisher2 > GOOSE2'
+    ]);
+    expect(driver.subheadings('used')).to.deep.equal([
       'GOOSE_Supervision/LGOS1',
       'GOOSE_Supervision/LGOS2'
     ]);
@@ -61,6 +65,9 @@ describe('oscd-editor-supervision', () => {
       )
     ).to.equal('GOOSE_PublisherQB2_Disconnector/LLN0.GOOSE2');
     expect(driver.headlines('used')).to.deep.equal([
+      'GOOSE_Publisher > GOOSE2'
+    ]);
+    expect(driver.subheadings('used')).to.deep.equal([
       'GOOSE_Supervision/LGOS1'
     ]);
   });
@@ -77,6 +84,9 @@ describe('oscd-editor-supervision', () => {
     )!;
     expect(supervisionLns(subscriber, 'GOOSE').length).to.equal(5);
     expect(driver.headlines('used')).to.deep.equal([
+      'GOOSE_Publisher > GOOSE2'
+    ]);
+    expect(driver.subheadings('used')).to.deep.equal([
       'GOOSE_Supervision/LGOS4'
     ]);
   });
@@ -115,7 +125,9 @@ describe('oscd-editor-supervision', () => {
       item.querySelector(
         'oscd-icon-button[data-action="delete"]'
       ) as HTMLButtonElement;
-    expect(driver.headlines('used')[0]).to.equal('GOOSE_Supervision/LGOS1');
+    expect(driver.subheadings('used')[0]).to.contain(
+      'GOOSE_Supervision/LGOS1'
+    );
     expect(deleteButton(items[0]).disabled).to.equal(true);
     expect(deleteButton(items[1]).disabled).to.equal(false);
   });

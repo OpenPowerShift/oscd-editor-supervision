@@ -54,21 +54,25 @@ export function supervisionPath(supervisionLn: Element): string {
 }
 
 /**
- * The description of a supervision logical node: its own `desc`, then the
- * `desc` of its `St` `DOI` or the `d` value inside it.
+ * The cascaded description of a supervision logical node: the `desc` of its
+ * `LDevice`, its own `desc`, and the `desc` of its `St` `DOI` or the `d` value
+ * inside it, joined with ` > `.
  * @param supervisionLn - an `LGOS` or `LSVS`.
  * @returns the description, or undefined when none is set.
  */
 export function supervisionDescription(
   supervisionLn: Element
 ): string | undefined {
+  const ldDescription = getDescriptionAttribute(
+    supervisionLn.closest('LDevice')!
+  );
   const lnDescription = getDescriptionAttribute(supervisionLn);
   const st = supervisionLn.querySelector(':scope > DOI[name="St"]');
   const stDescription = st
     ? getDescriptionAttribute(st) ??
       st.querySelector(':scope > DAI[name="d"] > Val')?.textContent?.trim()
     : undefined;
-  const descriptions = [lnDescription, stDescription].filter(
+  const descriptions = [ldDescription, lnDescription, stDescription].filter(
     description => !!description
   );
   return descriptions.length > 0 ? descriptions.join(' > ') : undefined;

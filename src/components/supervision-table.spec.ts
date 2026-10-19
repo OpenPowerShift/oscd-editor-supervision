@@ -21,10 +21,22 @@ describe('supervision-table', () => {
     );
 
     expect(element.shadowRoot!.textContent).to.contain(
-      'GOOSE_Supervision/LGOS1'
+      'GOOSE_Publisher > GOOSE2'
     );
     expect(element.shadowRoot!.textContent).to.contain(
-      'GOOSE_Publisher > GOOSE2'
+      'GOOSE_Supervision/LGOS1'
+    );
+  });
+
+  it('shows the description of the supervised control block in the heading', async () => {
+    const doc = await loadFixture('supervisions.scd');
+    doc.querySelector('GSEControl[name="GOOSE2"]')!.setAttribute('desc', 'Trip');
+    const model = buildModel(doc, ied(doc, 'GOOSE_Subscriber1'), 'GOOSE');
+    const element = await fixture<SupervisionTable>(
+      html`<supervision-table-spec .rows=${model.used}></supervision-table-spec>`
+    );
+    expect(element.shadowRoot!.textContent).to.contain(
+      'GOOSE_Publisher > GOOSE2 - Trip'
     );
   });
 
@@ -77,7 +89,8 @@ describe('supervision-table', () => {
       ) as HTMLButtonElement;
 
     expect(
-      (rows[0].querySelector('[slot="headline"]') as HTMLElement).textContent
+      (rows[0].querySelector('[slot="supporting-text"]') as HTMLElement)
+        .textContent
     ).to.contain('LGOS1');
     expect(deleteButton(rows[0]).disabled).to.equal(true);
     expect(deleteButton(rows[1]).disabled).to.equal(false);

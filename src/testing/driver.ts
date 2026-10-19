@@ -55,6 +55,18 @@ export class PluginDriver {
       .map(element => this.headline(element));
   }
 
+  /** The supporting text of the rows of a list, in order. */
+  subheadings(list: ListName): string[] {
+    return this.items(list)
+      .filter(element => element.classList.contains('row'))
+      .map(element =>
+        normalize(
+          element.querySelector<HTMLElement>('[slot="supporting-text"]')
+            ?.textContent
+        )
+      );
+  }
+
   private async settle(): Promise<void> {
     await this.mounted.settle();
   }

@@ -4,6 +4,15 @@ include::partial$base.adoc[]
 The *LGOS supervisions* section, or the *LSVS supervisions* section, shows the
 supervisions that supervise a control block the IED subscribes to.
 
+The main text of a row is the supervised control block, for example
+`GOOSE_Publisher > GOOSE2`.
+The row below it is the supervision, for example `GOOSE_Supervision/LGOS1`.
+The descriptions follow, from the logical device, the logical node and the `St`
+data of the supervision, joined with a `>`.
+A control block row in the control block list uses the same pattern: the IED and
+the control block are the main text, and the path, the descriptions, the data
+set and the id are below.
+
 .A used supervision
 image::supervision-selected.png[The plugin with one available supervision selected.]
 

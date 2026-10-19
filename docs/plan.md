@@ -795,6 +795,30 @@ design.
 * The orchestrator playbook points at the new repository.
 * No code, test or behaviour change.
 
+### Visual hierarchy (2026-10-20)
+
+The supervised control block was only in the supporting text of a supervision
+row, and descriptions were supporting-only.
+
+* A used supervision row now follows the reference plugin's control row: the
+  supervised control block `IED > CB` is the main text, with the control
+  block's own `desc` after it. The supervision path is the first fragment of
+  the supporting text, in a medium weight, followed by the cascaded
+  description.
+* A control block row shows `IED > CB - desc` in the main text, and the path,
+  the cascaded description, the data set and the id in the supporting text.
+* A supervision description is now a cascade of the `LDevice`, the logical node
+  and the `St` description (`d`), joined with ` > `, as the reference plugin
+  cascades an FCDA description. A control block description is a cascade of the
+  `LDevice`, the `LN0` and the control block.
+* The control block list shows either "Select a supervision first." or the
+  list, not both. Before, it showed the prompt and the empty message together.
+
+Verification: `npm run lint`, `npx tsc --noEmit` and `npm test` pass (119 tests,
+coverage 96.7 % statements). `npm run test:visual` runs the 12 states; the
+screenshots were inspected from `test/screenshots/failed/`, not committed.
+Baselines change with this design and will be replaced by the CI run.
+
 ---
 
 ## 10. Questions for you
