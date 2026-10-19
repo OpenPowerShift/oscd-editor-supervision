@@ -8,7 +8,9 @@ image::overview.png[The plugin. The header is at the top, and three lists are be
 
 The header shows the selected IED and the controls for the screen.
 
-IED selector:: The button at the left opens a dialog.
+IED selector:: The outlined button at the left shows the selected IED and a
+chevron.
+Click it to open a dialog.
 Select one IED in the dialog.
 Click btn:[Apply].
 .Click an IED

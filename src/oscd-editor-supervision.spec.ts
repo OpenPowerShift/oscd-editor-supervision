@@ -28,13 +28,13 @@ describe('oscd-editor-supervision', () => {
 
   it('selects the first IED of the selector by default', async () => {
     await mount();
-    expect(driver.emptyHeading()).to.equal('GOOSE_Publisher');
+    expect(driver.selectedIedName()).to.equal('GOOSE_Publisher');
     await driver.openIedDialog();
-    const filter = mounted.plugin
+    const list = mounted.plugin
       .shadowRoot!.querySelector('ied-selector')!
-      .shadowRoot!.querySelector('oscd-filter-button')!;
+      .shadowRoot!.querySelector('oscd-selection-list')!;
     const items = Array.from(
-      filter.shadowRoot!.querySelectorAll<HTMLElement>('oscd-list-item')
+      list.shadowRoot!.querySelectorAll<HTMLElement>('oscd-list-item')
     );
     const checked = items.find(item =>
       item.querySelector('oscd-radio')?.hasAttribute('checked')

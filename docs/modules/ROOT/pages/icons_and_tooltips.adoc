@@ -8,7 +8,8 @@ include::partial$base.adoc[]
 |Icon |Meaning
 
 |IED (`developer_board`)
-|The button opens the IED selection dialog.
+|The outlined button shows the selected IED.
+The chevron shows that it opens the IED selection dialog.
 
 |Heart monitor (`monitor_heart`)
 |A supervision logical node.

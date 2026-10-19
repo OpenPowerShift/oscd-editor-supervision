@@ -1,5 +1,4 @@
 import { deepQuery, deepQueryAll, normalize } from './dom.js';
-import { waitFor } from './plugin.js';
 import type { MountedPlugin } from './plugin.js';
 
 /** The plugin's list components a spec can drive. */
@@ -147,45 +146,49 @@ export class PluginDriver {
 
   /** Opens the IED selection dialog. */
   async openIedDialog(): Promise<void> {
-    const filter = this.child('ied-selector').shadowRoot!.querySelector(
-      'oscd-filter-button'
-    )!;
-    const dialog = filter.shadowRoot!.querySelector('oscd-dialog')!;
+    const selector = this.child('ied-selector');
+    const dialog = selector.shadowRoot!.querySelector('oscd-dialog')!;
     const opened = new Promise<void>((resolve) => {
       dialog.addEventListener('opened', () => resolve(), { once: true });
     });
-    (
-      filter.shadowRoot!.querySelector('oscd-icon-button') as HTMLElement
-    ).click();
+    (selector.shadowRoot!.querySelector('#iedButton') as HTMLElement).click();
     await opened;
+    const list = selector.shadowRoot!.querySelector(
+      'oscd-selection-list'
+    ) as HTMLElement & { updateComplete: Promise<unknown> };
+    await list.updateComplete;
   }
 
   /** Selects an IED in the open dialog and applies it. */
   async chooseIed(name: string): Promise<void> {
-    const filter = this.child('ied-selector').shadowRoot!.querySelector(
-      'oscd-filter-button'
-    )!;
+    const selector = this.child('ied-selector');
+    const dialog = selector.shadowRoot!.querySelector('oscd-dialog')!;
+    const list = selector.shadowRoot!.querySelector('oscd-selection-list')!;
     const item = Array.from(
-      filter.shadowRoot!.querySelectorAll<HTMLElement>('oscd-list-item')
+      list.shadowRoot!.querySelectorAll<HTMLElement>('oscd-list-item')
     ).find(element => normalize(element.textContent).includes(name));
     if (!item) {
       throw new Error(`No IED "${name}" in the dialog`);
     }
     item.click();
     await this.settle();
+    const closed = new Promise<void>((resolve) => {
+      dialog.addEventListener('closed', () => resolve(), { once: true });
+    });
     (
-      filter.shadowRoot!.querySelector('oscd-filled-button') as HTMLElement
+      selector.shadowRoot!.querySelector('oscd-filled-button') as HTMLElement
     ).click();
-    await waitFor(
-      () =>
-        (
-          filter.shadowRoot!.querySelector('oscd-dialog') as HTMLElement & {
-            open: boolean;
-          }
-        ).open === false,
-      'the IED dialog did not close'
-    );
+    await closed;
     await this.settle();
+  }
+
+  /** The name of the IED the selector button shows. */
+  selectedIedName(): string {
+    return normalize(
+      this.child('ied-selector').shadowRoot!.querySelector<HTMLElement>(
+        '.ied-name'
+      )?.textContent
+    );
   }
 
   /** Selects an IED from the button in one step. */

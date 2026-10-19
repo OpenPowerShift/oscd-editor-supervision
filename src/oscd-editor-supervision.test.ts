@@ -38,7 +38,11 @@ describe('oscd-editor-supervision screenshots', () => {
     await document.fonts.ready;
   }
 
-  const shot = (name: string) => visualDiff(mounted.plugin, name);
+  const shot = async (name: string) => {
+    (document.activeElement as HTMLElement | null)?.blur();
+    await mounted.settle();
+    return visualDiff(mounted.plugin, name);
+  };
 
   it('lgos initially', async () => {
     await mount();

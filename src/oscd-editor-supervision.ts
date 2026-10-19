@@ -233,26 +233,23 @@ export default class OscdEditorSupervision extends ScopedElementsMixin(
   }
 
   private renderHeader(ied: Element): TemplateResult {
-    const name = getNameAttribute(ied) ?? '';
     const type = ied.getAttribute('type');
     const description = getDescriptionAttribute(ied);
     const used = this.model.used.length;
     const total = used + this.model.available.length;
     return html`<header>
+      <h1 class="visually-hidden">${msg('Supervision')}</h1>
       <ied-selector
         .ieds=${this.ieds}
         .selected=${ied}
         @ied-select=${(event: CustomEvent<{ element: Element }>) =>
           this.handleIedSelect(event)}
       ></ied-selector>
-      <div class="title">
-        <h1>${name}</h1>
-        <p class="subtitle">
-          ${type ?? msg('Unknown type')}${description
-            ? html` - ${description}`
-            : nothing}
-        </p>
-      </div>
+      <p class="subtitle">
+        ${type ?? msg('Unknown type')}${description
+          ? html` - ${description}`
+          : nothing}
+      </p>
       ${this.renderSwitches()}
       <sort-button
         .order=${this.sortOrder}
@@ -415,10 +412,16 @@ export default class OscdEditorSupervision extends ScopedElementsMixin(
         border-bottom: 1px solid var(--md-sys-color-outline-variant);
       }
 
-      h1 {
-        font-size: 1.25rem;
-        font-weight: 500;
-        margin: 0;
+      .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+        border: 0;
       }
 
       .subtitle,

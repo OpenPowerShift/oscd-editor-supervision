@@ -795,6 +795,24 @@ design.
 * The orchestrator playbook points at the new repository.
 * No code, test or behaviour change.
 
+### IED selector affordance (2026-10-20)
+
+The IED selector was a standard Material icon button: an `OscdIconButton` with a
+`developer_board` glyph and no container. Standard icon buttons have no visible
+surface until hover, so the IED read as a decoration and not as a control.
+
+* The selector is now an `OscdOutlinedButton`: board icon, the selected IED name
+  and an `expand_more` chevron in one outlined pill. The outline and label use
+  the theme's `outline` and `primary` tokens, so the affordance is visible in
+  light and dark themes.
+* The dialog has btn:[Cancel] and btn:[Apply], like the sort dialog, and shows
+  the IED name, type, description and manufacturer.
+* The header no longer repeats the IED name in a visible `h1`; a visually hidden
+  `h1` keeps the page heading.
+* Screenshot tests blur the active element before the capture, so a focus ring
+  from the setup interaction is not part of the baseline.
+* The screen page and the icon page describe the new button.
+
 ### Row layout, sorting and issues #8 and #11 (2026-10-20)
 
 * A used row shows `supervision --> IED > CB` in the main text, with the control
