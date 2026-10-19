@@ -1,25 +1,17 @@
-import nodeResolve from '@rollup/plugin-node-resolve';
-import typescript from '@rollup/plugin-typescript';
-import { importMetaAssets } from '@web/rollup-plugin-import-meta-assets';
 import copy from 'rollup-plugin-copy';
+import oscdRollupConfig from '@omicronenergy/oscd-tooling/configs/rollup.config.js';
 
-export default {
-  input: './oscd-supervision.ts',
-  output: {
-    sourcemap: true, // Add source map to build output
-    format: 'es', // ES module type export
-    dir: 'dist', // The build output folder
-    // preserveModules: true,  // Keep directory structure and files
+// Extends the shared bundle config: the plugin entry point and the demo, plus
+// the deploy page this repository has always published next to them.
+const [pluginBundle, demoBundle] = oscdRollupConfig;
+
+export default [
+  {
+    ...pluginBundle,
+    plugins: [
+      ...pluginBundle.plugins,
+      copy({ targets: [{ src: 'demo/index.deploy.html', dest: 'dist' }] })
+    ]
   },
-  preserveEntrySignatures: 'strict', // leaves export of the plugin entry point
-
-  plugins: [
-    /* Resolve bare module imports */
-    nodeResolve(),
-    typescript(),
-    copy({
-      targets: [{ src: 'demo/index.deploy.html', dest: 'dist' }],
-    }),
-    importMetaAssets(),
-  ],
-};
+  demoBundle
+];
